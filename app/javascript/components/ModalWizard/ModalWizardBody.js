@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl, FormattedMessage } from 'react-intl';
+// import { injectIntl, FormattedMessage } from 'react-intl';
+import { connect } from 'react-redux';
+import { store } from '../../redux';
 import { bindMethods, noop, EmptyState, Spinner, Wizard } from 'patternfly-react';
 
 class ModalWizardBody extends React.Component {
@@ -10,7 +12,10 @@ class ModalWizardBody extends React.Component {
   }
 
   onStepClick(stepIndex) {
-    const { steps, goToStep } = this.props;
+    const { steps, goToStep, formError } = this.props;
+    if (formError) {
+      return;
+    }
     const step = steps[stepIndex];
     goToStep(stepIndex);
     if (step && step.onClick) {
@@ -22,7 +27,7 @@ class ModalWizardBody extends React.Component {
   stepProps(stepIndex, titleId) {
     const { activeStep } = this.props;
     const label = (stepIndex + 1).toString();
-    const title = this.props.intl.formatMessage({ id: titleId });
+    const title = this.props.title; //.intl.formatMessage({ id: titleId });
     return {
       key: `wizard-step-${title}`,
       stepIndex,
@@ -42,12 +47,12 @@ class ModalWizardBody extends React.Component {
             <Spinner size="lg" className="blank-slate-pf-icon" loading />
             <EmptyState.Action>
               <h3>
-                <FormattedMessage id={loadingTitle} />
+                {loadingTitle}
               </h3>
             </EmptyState.Action>
             <EmptyState.Action secondary>
               <p>
-                <FormattedMessage id={loadingMessage} />
+                {loadingMessage}
               </p>
             </EmptyState.Action>
           </EmptyState>
@@ -102,7 +107,7 @@ ModalWizardBody.propTypes = {
   activeStep: PropTypes.string,
   onClick: PropTypes.func,
   goToStep: PropTypes.func,
-  intl: PropTypes.object.isRequired
+  // intl: PropTypes.object.isRequired
 };
 
 ModalWizardBody.defaultProps = {
@@ -116,4 +121,13 @@ ModalWizardBody.defaultProps = {
   goToStep: noop
 };
 
-export default injectIntl(ModalWizardBody);
+const mapStateToProps = state => ({
+  formError: state.form.generalInfrastructureMapping && state.form.generalInfrastructureMapping.syncErrors,
+  form: state.form
+});
+
+export default connect(mapStateToProps)(
+  ModalWizardBody
+);
+
+// export default injectIntl(ModalWizardBody);
