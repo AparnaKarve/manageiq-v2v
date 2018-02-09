@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
-// import { noop, selectKeys } from 'patternfly-react';
+import { Form, Grid } from 'patternfly-react';
 import { bindActionCreators } from 'redux';
 // import { bindMethods } from 'patternfly-react';
 import {
@@ -14,6 +14,7 @@ import TextField from '../formUtils/TextField';
 // import { Field } from 'redux-form';
 // import requiredField from '../../redux/actions';
 import { load as loadAccount } from '../../redux/reducers/fieldData';
+// import {Form, FormGroup, FormControl, ControlLabel, HelpBlock, Col} from 'react-bootstrap';
 
 class GeneralInfrastructureMappingContainer extends React.Component {
   constructor(props) {
@@ -31,10 +32,16 @@ class GeneralInfrastructureMappingContainer extends React.Component {
     } = this.props;
 
     return (
-      <form className="form-horizontal">
-        <Field name="name" label={__("Name")} component={renderField} validate={[required]} type="text" labelClassName="col-sm-2 control-label"/>
-        <Field name="description" label={__("Description")} component={renderField} type="textarea" labelClassName="col-sm-2 control-label"/>
-      </form>
+      <Form horizontal>
+        <Field
+          name="name"
+          controlId="name"
+          label={__("Name")}
+          component={renderField}
+          validate={[required]}
+          type="text" />
+        <Field name="description" controlId="description" label={__("Description")} component={renderField} type="textarea" rows="2" />
+      </Form>
     );
   }
 }
@@ -123,36 +130,28 @@ const alphaNumeric = value =>
     ? 'Only alphanumeric characters'
     : undefined;
 
-// let style = {'border-color': error ? '#cc0000' : '#d1d1d1'};
-
 const renderField = ({
                        input,
                        label,
+                       controlId,
                        type,
-                       labelClassName,
-                       meta: { pristine, touched, error, warning }
-                     }) => (
-  <div className="form-group has-error">
-    <label className={labelClassName}>{label}</label>
-    <div className="col-sm-10">
-      {type === 'textarea' ? (
-        <textarea {...input} className1="form-control" style1={{borderColor: error ? '#cc0000' : '#d1d1d1'}} />
-      ) : (
-        <input {...input} type={type} className1={type === 'checkbox' ? '' : 'form-control'} style1={{borderColor: error ? '#cc0000' : '#0088ce'}} />
-      )}
+                       meta: { pristine, touched, error, warning },
+                       ...props
+                     }) => {
 
-      {(touched || pristine) &&
-      ((error &&
-        <span className="help-block">
-          {error}
-        </span>) ||
-        (warning &&
-          <span className="help-block">
-            {warning}
-          </span>))}
-    </div>
-  </div>
-)
+  const formGroupProps = {key: {label}, controlId, ...props};
 
+  if (error) formGroupProps.validationState = 'error';
 
-
+  return (
+    <Form.FormGroup {...formGroupProps}>
+      <Grid.Col componentClass={Form.ControlLabel} sm={2}>
+        {label}
+      </Grid.Col>
+      <Grid.Col sm={9}>
+        <Form.FormControl {...input} type={type} componentClass={type === 'text' ? undefined : type} />
+        {pristine && error && <Form.HelpBlock>{error}</Form.HelpBlock>}
+      </Grid.Col>
+    </Form.FormGroup>
+  );
+};
