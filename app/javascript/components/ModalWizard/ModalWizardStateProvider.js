@@ -26,6 +26,10 @@ class ModalWizardStateProvider extends React.Component {
     this.setState({ activeStepIndex });
   }
 
+  onHide() {
+    this.state.form.generalInfrastructureMapping.forceUnregisterOnUnmount = true;
+  }
+
   render() {
     const { numSteps, children } = this.props;
     const { activeStepIndex } = this.state;

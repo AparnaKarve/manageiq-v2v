@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import { connect } from 'react-redux';
 import { noop, Modal, Wizard, Icon, Button } from 'patternfly-react';
 
 const ModalWizard = props => {
@@ -15,10 +16,22 @@ const ModalWizard = props => {
     activeStep,
     numSteps,
     goToStep,
-    children
+    children,
+    formError,
+    form
   } = props;
+  const disableNextStep = formError ? true : false;
   const onFirstStep = activeStepIndex === 0;
   const onFinalStep = activeStepIndex === numSteps - 1;
+
+  const onCancel = () => {
+    // form.generalInfrastructureMapping.forceUnregisterOnUnmount = true;
+    form.generalInfrastructureMapping.values = {};
+    onHide();
+  };
+
+  const onClose = onCancel;
+
   return (
     <Modal
       show={showWizard}
@@ -30,7 +43,7 @@ const ModalWizard = props => {
         <Modal.Header>
           <button
             className="close"
-            onClick={onHide}
+            onClick={onClose}
             aria-hidden="true"
             aria-label="Close"
           >
@@ -48,14 +61,14 @@ const ModalWizard = props => {
           )}
         </Modal.Body>
         <Modal.Footer className="wizard-pf-footer">
-          <Button bsStyle="default" className="btn-cancel" onClick={onHide}>
+          <Button bsStyle="default" className="btn-cancel" onClick={onCancel}>
             <FormattedMessage id="wizard.cancel" />
           </Button>
           <Button bsStyle="default" onClick={onBack} disabled={onFirstStep}>
             <Icon type="fa" name="angle-left" />
             <FormattedMessage id="wizard.back" />
           </Button>
-          <Button bsStyle="primary" onClick={onFinalStep ? onHide : onNext}>
+          <Button bsStyle="primary" onClick={onFinalStep ? onHide : onNext} disabled={disableNextStep}>
             {onFinalStep ? (
               <FormattedMessage id="wizard.close" />
             ) : (
@@ -86,7 +99,7 @@ ModalWizard.propTypes = {
 ModalWizard.defaultProps = {
   showWizard: false,
   title: '',
-  onHide: noop,
+  onHide: PropTypes.func,
   onExited: noop,
   onBack: noop,
   onNext: noop,
@@ -97,4 +110,11 @@ ModalWizard.defaultProps = {
   children: null
 };
 
-export default ModalWizard;
+const mapStateToProps = state => ({
+  formError: state.form.generalInfrastructureMapping && state.form.generalInfrastructureMapping.syncErrors,
+  form: state.form
+});
+
+export default connect(mapStateToProps)(
+  ModalWizard
+);

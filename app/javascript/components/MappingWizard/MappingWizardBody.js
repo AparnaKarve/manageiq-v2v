@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ModalWizard from '../ModalWizard';
+import GeneralInfrastructureMappingContainer from '../GeneralInfrastructureMapping';
 
 // TODO remove these, they are space fillers
 const t = str => (
@@ -18,6 +19,12 @@ const todo = str => (
   </div>
 );
 
+const renderGeneralInfrastructureMapping = str => (
+  <GeneralInfrastructureMappingContainer>
+    {t(str)}
+  </GeneralInfrastructureMappingContainer>
+);
+
 const MappingWizardBody = props => (
   <ModalWizard.Body
     {...props}
@@ -26,7 +33,7 @@ const MappingWizardBody = props => (
     steps={[
       {
         title: 'mappingWizard.general',
-        render: () => todo('Name and Description Fields'),
+        render: () => renderGeneralInfrastructureMapping('Name and Description Fields'), //todo('Name and Description Fields'), //renderGeneralInfrastructureMapping('Name and Description Fields'),
         onClick: () => console.log('on step 1 click')
       },
       {
