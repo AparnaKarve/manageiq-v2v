@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import ModalWizard from '../../components/ModalWizard';
 import PlanWizardGeneralStep from '../PlanWizard/components/PlanWizardGeneralStep';
 import PlanWizardCSVStep from '../PlanWizard/components/PlanWizardCSVStep';
+import PlanWizardResultsStep from '../PlanWizard/components/PlanWizardResultsStep';
 
 // TODO remove these, they are space fillers
 const t = str => (
@@ -36,7 +37,7 @@ const PlanWizardBody = props => (
       },
       {
         title: __('Results'),
-        render: () => todo('Display Progress and Results')
+        render: () => <PlanWizardResultsStep />
       }
     ]}
   />

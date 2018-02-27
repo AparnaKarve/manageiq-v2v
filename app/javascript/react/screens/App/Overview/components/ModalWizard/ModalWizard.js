@@ -19,6 +19,7 @@ const ModalWizard = props => {
   const {
     title,
     showWizard,
+    onClose,
     onHide,
     onExited,
     onBack,
@@ -39,9 +40,14 @@ const ModalWizard = props => {
     Object.prototype.hasOwnProperty.call(formContainer, currentReduxForm) &&
     !!formContainer[currentReduxForm].syncErrors;
 
+  // const onClose = () => {
+  //   // onHide();
+  // };
+
   return (
     <Modal
       show={showWizard}
+      onClose={onClose}
       onHide={onHide}
       onExited={onExited}
       dialogClassName="modal-lg wizard-pf"
@@ -78,7 +84,7 @@ const ModalWizard = props => {
           </Button>
           <Button
             bsStyle="primary"
-            onClick={onFinalStep ? onHide : onNext}
+            onClick={onFinalStep ? onClose : onNext}
             disabled={disableNextStep}
           >
             {onFinalStep ? __('Close') : __('Next')}
@@ -93,6 +99,7 @@ const ModalWizard = props => {
 ModalWizard.propTypes = {
   showWizard: PropTypes.bool,
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  onClose: PropTypes.func,
   onHide: PropTypes.func,
   onExited: PropTypes.func,
   onBack: PropTypes.func,
@@ -108,6 +115,7 @@ ModalWizard.propTypes = {
 ModalWizard.defaultProps = {
   showWizard: false,
   title: '',
+  onClose: noop,
   onHide: noop,
   onExited: noop,
   onBack: noop,

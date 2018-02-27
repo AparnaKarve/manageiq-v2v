@@ -6,12 +6,14 @@ import PlanWizardBody from './PlanWizardBody';
 
 const PlanWizard = ({
   hidePlanWizard,
+  closePlanWizardAction,
   hidePlanWizardAction,
   planWizardExitedAction
 }) => (
   <ModalWizard.StateProvider numSteps={3}>
     <ModalWizard
       showWizard={!hidePlanWizard}
+      onClose={closePlanWizardAction}
       onHide={hidePlanWizardAction}
       onExited={planWizardExitedAction}
       title={__('Migration Plan Wizard')}
@@ -22,11 +24,13 @@ const PlanWizard = ({
 );
 PlanWizard.propTypes = {
   hidePlanWizard: PropTypes.bool,
+  closePlanWizardAction: PropTypes.func,
   hidePlanWizardAction: PropTypes.func,
   planWizardExitedAction: PropTypes.func
 };
 PlanWizard.defaultProps = {
   hidePlanWizard: true,
+  closePlanWizardAction: noop,
   hidePlanWizardAction: noop,
   planWizardExitedAction: noop
 };

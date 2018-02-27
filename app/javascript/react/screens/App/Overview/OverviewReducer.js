@@ -5,6 +5,7 @@ import {
   HIDE_MAPPING_WIZARD,
   MAPPING_WIZARD_EXITED,
   SHOW_PLAN_WIZARD,
+  CLOSE_PLAN_WIZARD,
   HIDE_PLAN_WIZARD,
   PLAN_WIZARD_EXITED,
   FETCH_V2V_TRANSFORMATION_MAPPINGS
@@ -38,6 +39,8 @@ export default (state = initialState, action) => {
         hidePlanWizard: false,
         planWizardId: action.payload.id || null
       });
+    case CLOSE_PLAN_WIZARD:
+      return state.set('hidePlanWizard', true);
     case HIDE_PLAN_WIZARD:
       return state.set('hidePlanWizard', true).set('planWizardId', null);
     case PLAN_WIZARD_EXITED:

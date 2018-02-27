@@ -3,6 +3,7 @@
 exports[`Plan Wizard integration test should mount the PlanWizard with mapStateToProps reduced 1`] = `
 Object {
   "hidePlanWizard": false,
+  "closePlanWizardAction": [Function],
   "hidePlanWizardAction": [Function],
   "planWizardExitedAction": [Function],
 }
