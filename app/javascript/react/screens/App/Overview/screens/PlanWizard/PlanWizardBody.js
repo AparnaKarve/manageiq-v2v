@@ -46,13 +46,15 @@ const PlanWizardBody = props => (
 PlanWizardBody.propTypes = {
   loaded: PropTypes.bool,
   activeStepIndex: PropTypes.number,
-  activeStep: PropTypes.string
+  activeStep: PropTypes.string,
+  plansBody: PropTypes.object
 };
 
 PlanWizardBody.defaultProps = {
   loaded: false,
   activeStepIndex: 0,
-  activeStep: '1'
+  activeStep: '1',
+  plansBody: {}
 };
 
 export default PlanWizardBody;
