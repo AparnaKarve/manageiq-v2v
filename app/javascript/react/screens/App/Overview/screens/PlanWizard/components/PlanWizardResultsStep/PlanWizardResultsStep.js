@@ -26,7 +26,7 @@ class PlanWizardResultsStep extends React.Component {
             {__('Creating Migration Plans...')}
           </h3>
           <p className="blank-slate-pf-secondary-action">
-            {__('Please wait while infrastructure mapping is created.')}
+            {__('Please wait while the migration plan is created.')}
           </p>
         </div>
       );
