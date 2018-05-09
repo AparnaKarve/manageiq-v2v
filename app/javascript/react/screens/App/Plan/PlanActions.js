@@ -1,11 +1,13 @@
 import URI from 'urijs';
+import { saveAs } from 'file-saver';
 import API from '../../../../common/API';
 
 import {
   FETCH_V2V_PLAN_REQUEST,
   FETCH_V2V_PLAN,
   QUERY_V2V_PLAN_VMS,
-  RESET_PLAN_STATE
+  RESET_PLAN_STATE,
+  FETCH_V2V_MIGRATION_TASK_LOG
 } from './PlanConstants';
 
 // *****************************************************************************
@@ -72,6 +74,32 @@ export const resetPlanStateAction = () => ({
   type: RESET_PLAN_STATE
 });
 
-export const downloadLogAction = taskId => {
+export const downloadLogAction = task => dispatch =>
   // todo: write download log api logic
-};
+  dispatch({
+    type: FETCH_V2V_MIGRATION_TASK_LOG,
+    payload: new Promise((resolve, reject) => {
+      API.get(`/migration_log/download_migration_log/${task.id}`)
+        .then(response => {
+          resolve(response);
+          if (response.data.status === 'Ok') {
+            const blob = new Blob([response.data.log_contents], {
+              type: 'text/plain;charset=utf-8'
+            });
+            saveAs(blob, `v2v_${taskId}.log`);
+          } else {
+            const file = new File(
+              [response.data.status_message],
+              `${task.options.virtv2v_wrapper.v2v_log.substr(
+                task.options.virtv2v_wrapper.v2v_log.lastIndexOf('/') + 1
+              )}`,
+              { type: 'text/plain;charset=utf-8' }
+            );
+            saveAs(file);
+          }
+        })
+        .catch(e => {
+          reject(e);
+        });
+    })
+  });
