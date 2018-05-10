@@ -83,10 +83,18 @@ export const downloadLogAction = task => dispatch =>
         .then(response => {
           resolve(response);
           if (response.data.status === 'Ok') {
-            const blob = new Blob([response.data.log_contents], {
-              type: 'text/plain;charset=utf-8'
-            });
-            saveAs(blob, `v2v_${taskId}.log`);
+            // const blob = new Blob([response.data.log_contents], {
+            //   type: 'text/plain;charset=utf-8'
+            // });
+            // saveAs(blob, `v2v_${taskId}.log`);
+            const file = new File(
+              [response.data.log_contents],
+              `${task.options.virtv2v_wrapper.v2v_log.substr(
+                task.options.virtv2v_wrapper.v2v_log.lastIndexOf('/') + 1
+              )}`,
+              { type: 'text/plain;charset=utf-8' }
+            );
+            saveAs(file);
           } else {
             const file = new File(
               [response.data.status_message],
