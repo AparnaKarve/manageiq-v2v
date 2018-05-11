@@ -274,7 +274,12 @@ class PlanRequestDetailList extends React.Component {
       pageChangeValue
     } = this.state;
 
-    const { downloadLogAction } = this.props;
+    const {
+      downloadLogAction,
+      addNotificationAction,
+      isFetchingMigrationTaskLog,
+      isRejectedMigrationTaskLog
+    } = this.props;
 
     const paginatedSortedFiltersTasks = this.filterSortPaginatePlanRequestTasks();
 
@@ -399,7 +404,7 @@ class PlanRequestDetailList extends React.Component {
                     </div>
                     <div>
                       <b>{__('Description')}: </b>
-                      {task.options.progress.current_description}
+                      {task.options.progress && task.options.progress.current_description}
                     </div>
                     {task.taskCompleted && (
                       <div>
@@ -474,15 +479,19 @@ class PlanRequestDetailList extends React.Component {
                     </ListView.InfoItem>
                   ]}
                   actions={
-                    <a
-                      href="#"
-                      onClick={e => {
-                        e.preventDefault();
-                        downloadLogAction(task);
-                      }}
-                    >
-                      {__('Download Log')}
-                    </a>
+                    isFetchingMigrationTaskLog ? (
+                      <label>{__('Download log in progress...')}</label>
+                    ) : (
+                      <a
+                        href="#"
+                        onClick={e => {
+                          e.preventDefault();
+                          downloadLogAction(task, addNotificationAction);
+                        }}
+                      >
+                        {__('Download Log')}
+                      </a>
+                    )
                   }
                   stacked
                 />
@@ -513,7 +522,10 @@ class PlanRequestDetailList extends React.Component {
 
 PlanRequestDetailList.propTypes = {
   planRequestTasks: PropTypes.array,
-  downloadLogAction: PropTypes.func
+  downloadLogAction: PropTypes.func,
+  isFetchingMigrationTaskLog: PropTypes.bool,
+  isRejectedMigrationTaskLog: PropTypes.bool,
+  addNotificationAction: PropTypes.func
 };
 
 export default PlanRequestDetailList;

@@ -74,7 +74,7 @@ export const resetPlanStateAction = () => ({
   type: RESET_PLAN_STATE
 });
 
-export const downloadLogAction = task => dispatch =>
+export const downloadLogAction = (task, addNotificationAction) => dispatch =>
   // todo: write download log api logic
   dispatch({
     type: FETCH_V2V_MIGRATION_TASK_LOG,
@@ -82,28 +82,31 @@ export const downloadLogAction = task => dispatch =>
       API.get(`/migration_log/download_migration_log/${task.id}`)
         .then(response => {
           resolve(response);
+          // const v2vLogFileName = task.options.virtv2v_wrapper.v2v_log.substr(
+          //   task.options.virtv2v_wrapper.v2v_log.lastIndexOf('/') + 1
+          // );
+          const v2vLogFileName = `${task.vmName}.log`;
           if (response.data.status === 'Ok') {
-            // const blob = new Blob([response.data.log_contents], {
-            //   type: 'text/plain;charset=utf-8'
-            // });
-            // saveAs(blob, `v2v_${taskId}.log`);
             const file = new File(
               [response.data.log_contents],
-              `${task.options.virtv2v_wrapper.v2v_log.substr(
-                task.options.virtv2v_wrapper.v2v_log.lastIndexOf('/') + 1
-              )}`,
+              v2vLogFileName,
               { type: 'text/plain;charset=utf-8' }
             );
             saveAs(file);
+            const successMsg = sprintf(__('%s download successful'), task.vmName);
+            addNotificationAction({
+              message: successMsg,
+              notificationType: 'success',
+              persistent: true,
+              actionEnabled: false
+            });
           } else {
-            const file = new File(
-              [response.data.status_message],
-              `${task.options.virtv2v_wrapper.v2v_log.substr(
-                task.options.virtv2v_wrapper.v2v_log.lastIndexOf('/') + 1
-              )}`,
-              { type: 'text/plain;charset=utf-8' }
-            );
-            saveAs(file);
+            addNotificationAction({
+              message: response.data.status_message,
+              notificationType: 'error',
+              persistent: true,
+              actionEnabled: false
+            });
           }
         })
         .catch(e => {
