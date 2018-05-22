@@ -399,11 +399,11 @@ class PlanRequestDetailList extends React.Component {
                     </div>
                     <div>
                       <b>{__('Description')}: </b>
-                      {task.options.progress.current_description}
+                      {task.options.progress && task.options.progress.current_description}
                     </div>
                     <div>
                       <b>{__('Conversion Host')}: </b>
-                      {task.options.transformation_host_name}
+                      {task.transformation_host_name}
                     </div>
                     {task.taskCompleted && (
                       <div>
