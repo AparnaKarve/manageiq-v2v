@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import { Icon, ListView, Grid } from 'patternfly-react';
+import { Icon, ListView, Grid, Modal } from 'patternfly-react';
 import OverviewEmptyState from '../OverviewEmptyState/OverviewEmptyState';
 
 function clusterCount(mapping, clusterType) {
@@ -27,7 +27,16 @@ function clusterName(clusters, clusterId) {
 const InfrastructureMappingsList = ({
   clusters,
   transformationMappings,
-  createInfraMappingClick
+  createInfraMappingClick,
+  requestsInProgressMappings,
+  // noPlanAssociationsMappings,
+  // requestsCompletedSuccessfullyMappings,
+  // notStartedPlansMappings,
+  // requestsCompletedWithErrorsMappings,
+  setMappingToDelete,
+  showDeleteConfirmationModalAction,
+  deleteInfraMappingAction,
+  yesToDeleteMapping
 }) => (
   <Grid.Col
     xs={12}
@@ -81,6 +90,37 @@ const InfrastructureMappingsList = ({
                       'destination_id'
                     )}
                   </strong>&nbsp;{__('Target Clusters')}
+                </ListView.InfoItem>,
+                <ListView.InfoItem key={2}>
+                  {requestsInProgressMappings.find(
+                    request => request === mapping.id
+                  ) ? (
+                    <Icon
+                      className="delete-infra-mapping-icon-disabled"
+                      type="pf"
+                      name="delete"
+                    />
+                  ) : (
+                    <Icon
+                      type="pf"
+                      name="delete"
+                      onClick={e => {
+                        // e.preventDefault();
+                        // alert('hi');
+                        // deleteInfraMapping(mapping);
+                        // deleteConfirmModal();
+                        // deleteConfirmationModalAction(true);
+                        setMappingToDelete(mapping);
+                        showDeleteConfirmationModalAction();
+                        // showDeleteConfirmationModalAction().then(() => {
+                        //   const { yesToDeleteMapping } = this.props;
+                        //   if (yesToDeleteMapping) {
+                        //     deleteInfraMappingAction(mapping);
+                        //   }
+                        // });
+                      }}
+                    />
+                  )}
                 </ListView.InfoItem>
               ]}
             >
@@ -136,7 +176,16 @@ const InfrastructureMappingsList = ({
 InfrastructureMappingsList.propTypes = {
   clusters: PropTypes.array,
   transformationMappings: PropTypes.array,
-  createInfraMappingClick: PropTypes.func
+  createInfraMappingClick: PropTypes.func,
+  requestsInProgressMappings: PropTypes.array,
+  noPlanAssociationsMappings: PropTypes.array,
+  requestsCompletedSuccessfullyMappings: PropTypes.array,
+  notStartedPlansMappings: PropTypes.array,
+  requestsCompletedWithErrorsMappings: PropTypes.array,
+  setMappingToDelete: PropTypes.func,
+  showDeleteConfirmationModalAction: PropTypes.func,
+  deleteInfraMappingAction: PropTypes.func,
+  yesToDeleteMapping: PropTypes.bool
 };
 
 export default InfrastructureMappingsList;

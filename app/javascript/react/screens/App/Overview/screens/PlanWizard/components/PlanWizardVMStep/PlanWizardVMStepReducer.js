@@ -36,7 +36,7 @@ const _formatInvalidVms = vms =>
     ) {
       v.warning = true;
     } else {
-      v.invalid = true;
+      v.invalid = false;
     }
 
     return v;

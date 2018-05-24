@@ -5,7 +5,10 @@ import {
   Card,
   Breadcrumb,
   CardGrid,
-  Spinner
+  Spinner,
+  Icon,
+  Modal,
+  Button
 } from 'patternfly-react';
 import Toolbar from '../../../config/Toolbar';
 import * as AggregateCards from './components/AggregateCards';
@@ -26,7 +29,9 @@ class Overview extends React.Component {
       'stopPolling',
       'startPolling',
       'createTransformationPlanRequest',
-      'redirectTo'
+      'redirectTo',
+      'deleteInfraMapping',
+      'deleteMessage'
     ]);
 
     this.mappingWizard = componentRegistry.markup(
@@ -101,7 +106,7 @@ class Overview extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { finishedTransformationPlans, addNotificationAction } = this.props;
+    const { finishedTransformationPlans, addNotificationAction, yesToDeleteMapping } = this.props;
     const { hasMadeInitialPlansFetch } = this.state;
 
     if (
@@ -142,6 +147,11 @@ class Overview extends React.Component {
           actionEnabled: true
         });
       });
+    }
+
+    if (yesToDeleteMapping) {
+      const { deleteInfraMappingAction, mappingToDelete} = this.props;
+      deleteInfraMappingAction(mappingToDelete);
     }
   }
 
@@ -187,6 +197,64 @@ class Overview extends React.Component {
     history.push(path);
   }
 
+  deleteInfraMapping(mapping) {
+    const { deleteInfraMappingAction, hideDeleteConfirmationModalAction } = this.props;
+    deleteInfraMappingAction(mapping);
+    hideDeleteConfirmationModalAction();
+  }
+
+  deleteMessage(mappingToDelete) {
+    const mappings = [];
+    const planNames = [];
+
+    const { transformationPlans, allRequestsWithTasks } = this.props;
+    const notStartedPlans = transformationPlans
+      .filter(plan => plan.miq_requests.length === 0);
+
+    notStartedPlans.map(plan =>
+        mappings.push(
+          plan.options.config_info
+            .transformation_mapping_id
+        )
+      );
+
+    notStartedPlans.map(plan =>
+        planNames.push(
+          plan.name
+        )
+      );
+
+    const requestsCompletedWithErrors = allRequestsWithTasks
+      .filter(request => request.request_state === "finished" && request.status === "Error");
+
+    requestsCompletedWithErrors.map(request =>
+        mappings.push(
+          request.service_template.options.config_info
+            .transformation_mapping_id
+        )
+      );
+
+    requestsCompletedWithErrors.map(request =>
+      planNames.push(
+        request.service_template.name
+      )
+    );
+
+    const mappingWithStyling = <strong>{mappingToDelete.name}</strong>;
+    const regularDeleteMessage = sprintf(__('Are you sure you want to delete the infrastructure mapping %s ?'), mappingWithStyling);
+    const regularDeleteMessageStyled = <label>{regularDeleteMessage}</label>;
+
+    if (mappings.filter(mapping => mapping === mappingToDelete.id)) {
+      const deleteStr = __("The infrastructure mapping is associated with migration plans that include unmigrated VMs. Deleting the mapping will prevent you from migrating the VMs in these plans:");
+
+      const del = <div><h3>{deleteStr}</h3> <br/> <strong>{planNames.map(plan => <ul>{plan}</ul>)}</strong></div>;
+
+      return <div>{del}<br/>{regularDeleteMessageStyled}</div>;
+
+      }
+      return regularDeleteMessageStyled;
+  }
+
   render() {
     const {
       showMappingWizardAction,
@@ -207,8 +275,86 @@ class Overview extends React.Component {
       isCreatingTransformationPlanRequest,
       clusters,
       migrationsFilter,
-      setMigrationsFilterAction
+      setMigrationsFilterAction,
+      deleteConfirmationModal,
+      mappingToDelete,
+      deleteInfraMappingAction,
+      setMappingToDelete,
+      showDeleteConfirmationModalAction,
+      hideDeleteConfirmationModalAction,
+      yesAndHideDeleteConfirmationModalAction,
+      yesToDeleteMapping
     } = this.props;
+
+    const transformationMappingsUsedInProgressRequests = () => {
+      // const inProgressRequests = allRequestsWithTasks.filter(request => request.fulfilled_on === null);
+      const mappings = [];
+
+      allRequestsWithTasks
+        .filter(request => request.fulfilled_on === null)
+        .map(request =>
+          mappings.push(
+            request.service_template.options.config_info
+              .transformation_mapping_id
+          )
+        );
+      return mappings;
+    };
+
+    const transformationMappingsWithNoPlanAssociations = () => {
+      const mappings = [];
+
+      transformationMappings
+        .filter(mapping => mapping.service_template.length === 0)
+        .map(mapping =>
+          mappings.push(
+            mapping.id
+          )
+        );
+      return mappings;
+    };
+
+    const transformationMappingsWithRequestsCompletedSuccessfully = () => {
+      const mappings = [];
+
+      allRequestsWithTasks
+        .filter(request => request.request_state === "finished" && request.status === "Ok")
+        .map(request =>
+          mappings.push(
+            request.service_template.options.config_info
+              .transformation_mapping_id
+          )
+        );
+      return mappings;
+    };
+
+    const transformationMappingsWithNotStartedPlans = () => {
+      const mappings = [];
+
+      transformationPlans
+        .filter(plan => plan.miq_requests.length === 0)
+        .map(plan =>
+          mappings.push(
+            plan.options.config_info
+              .transformation_mapping_id
+          )
+        );
+      return mappings;
+    };
+
+    const transformationMappingsWithRequestsCompletedWithErrors = () => {
+      const mappings = [];
+
+      allRequestsWithTasks
+        .filter(request => request.request_state === "finished" && request.status === "Error")
+        .map(request =>
+          mappings.push(
+            request.service_template.options.config_info
+              .transformation_mapping_id
+          )
+        );
+      return mappings;
+    };
 
     const aggregateDataCards = (
       <div className="row-cards-pf">
@@ -290,7 +436,46 @@ class Overview extends React.Component {
             clusters={clusters}
             transformationMappings={transformationMappings}
             createInfraMappingClick={showMappingWizardAction}
+            requestsInProgressMappings={transformationMappingsUsedInProgressRequests()}
+            // noPlanAssociationsMappings={transformationMappingsWithNoPlanAssociations()}
+            // requestsCompletedSuccessfullyMappings={transformationMappingsWithRequestsCompletedSuccessfully()}
+            // notStartedPlansMappings={transformationMappingsWithNotStartedPlans()}
+            // requestsCompletedWithErrorsMappings={transformationMappingsWithRequestsCompletedWithErrors()}
+            setMappingToDelete={setMappingToDelete}
+            showDeleteConfirmationModalAction={showDeleteConfirmationModalAction}
           />
+          <Modal
+            show={deleteConfirmationModal}
+            onHide={hideDeleteConfirmationModalAction}
+          >
+            <Modal.Header>
+              <Modal.CloseButton onClick={hideDeleteConfirmationModalAction} />
+              <Modal.Title>{__('Delete Infrastructure Mapping')}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body className="warning-modal-body">
+              <div className="warning-modal-body--icon">
+                <Icon type="pf" name="delete" />
+              </div>
+              <div className="warning-modal-body--list">
+                <h3>
+                  {/*{mappingToDelete && sprintf(__('Are you sure you want to delete the infrastructure mapping "%s"?'), mappingToDelete.name)}*/}
+                  {mappingToDelete && this.deleteMessage(mappingToDelete)}
+                </h3>
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button
+                bsStyle="default"
+                className="btn-cancel"
+                onClick={hideDeleteConfirmationModalAction}
+              >
+                {__("Cancel")}
+              </Button>
+              <Button bsStyle="primary" onClick={yesAndHideDeleteConfirmationModalAction}>
+                {__("Delete")}
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </Spinner>
       </div>
     );
@@ -348,6 +533,14 @@ Overview.propTypes = {
   migrationsFilter: PropTypes.string,
   setMigrationsFilterAction: PropTypes.func,
   retryMigrationAction: PropTypes.func,
-  history: PropTypes.object
+  history: PropTypes.object,
+  deleteInfraMappingAction: PropTypes.func,
+  deleteConfirmationModal: PropTypes.bool,
+  mappingToDelete: PropTypes.object,
+  setMappingToDelete: PropTypes.func,
+  showDeleteConfirmationModalAction: PropTypes.func,
+  hideDeleteConfirmationModalAction: PropTypes.func,
+  yesAndHideDeleteConfirmationModalAction: PropTypes.func,
+  yesToDeleteMapping: PropTypes.bool
 };
 export default Overview;
