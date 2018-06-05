@@ -24,8 +24,8 @@ import {
 } from './OverviewConstants';
 
 export const initialState = Immutable({
-  mappingWizardVisible: false,
-  hideMappingWizard: true,
+  mappingWizardVisible: true,
+  hideMappingWizard: false,
   planWizardVisible: false,
   hidePlanWizard: true,
   planWizardId: null,
@@ -54,7 +54,7 @@ export const initialState = Immutable({
   shouldReloadMappings: false,
   clusters: [],
   migrationsFilter: 'Migration Plans Not Started',
-  showDeleteConfirmationModal: false
+  showDeleteConfirmationModal: true
 });
 
 export default (state = initialState, action) => {
