@@ -15,24 +15,32 @@ import {
 
 import { V2V_NOTIFICATION_ADD } from '../common/NotificationList/NotificationConstants';
 
+import { migrationPlan, requestWithTasks } from './playbooks.fixtures';
+
 // *****************************************************************************
 // * FETCH_V2V_ALL_REQUESTS_WITH_TASKS_FOR_PLAN
 // *****************************************************************************
-const _getTasksForAllRequestsForPlanActionCreator = (url, allRequests) => dispatch => {
+// const _getTasksForAllRequestsForPlanActionCreator = (url, allRequests) => dispatch => {
+//   dispatch({
+//     type: FETCH_V2V_ALL_REQUESTS_WITH_TASKS_FOR_PLAN,
+//     payload: new Promise((resolve, reject) => {
+//       API.post(url, {
+//         action: 'query',
+//         resources: allRequests
+//       })
+//         .then(response => {
+//           resolve(response);
+//         })
+//         .catch(e => reject(e));
+//     })
+//   })
+// }
+
+const _getTasksForAllRequestsForPlanActionCreator = url => dispatch =>
   dispatch({
-    type: FETCH_V2V_ALL_REQUESTS_WITH_TASKS_FOR_PLAN,
-    payload: new Promise((resolve, reject) => {
-      API.post(url, {
-        action: 'query',
-        resources: allRequests
-      })
-        .then(response => {
-          resolve(response);
-        })
-        .catch(e => reject(e));
-    })
+    type: FETCH_V2V_PLAN_REQUEST,
+    payload: Promise.resolve({ data: { results: [requestWithTasks] } })
   });
-};
 
 export const fetchTasksForAllRequestsForPlanAction = (url, allRequests) =>
   _getTasksForAllRequestsForPlanActionCreator(url, allRequests);
@@ -59,18 +67,23 @@ export const queryPlanVmsAction = ids => _queryPlanVmsActionCreator(ids);
 // *****************************************************************************
 // * FETCH_V2V_PLAN
 // *****************************************************************************
+// export const _getPlanActionCreator = url => dispatch =>
+//   dispatch({
+//     type: FETCH_V2V_PLAN,
+//     payload: new Promise((resolve, reject) => {
+//       API.get(url)
+//         .then(response => {
+//           resolve(response);
+//         })
+//         .catch(e => {
+//           reject(e);
+//         });
+//     })
+//   });
 export const _getPlanActionCreator = url => dispatch =>
   dispatch({
     type: FETCH_V2V_PLAN,
-    payload: new Promise((resolve, reject) => {
-      API.get(url)
-        .then(response => {
-          resolve(response);
-        })
-        .catch(e => {
-          reject(e);
-        });
-    })
+    payload: Promise.resolve({ data: migrationPlan })
   });
 
 export const fetchPlanAction = (url, id) => {
