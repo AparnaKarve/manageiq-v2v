@@ -15,7 +15,9 @@ import {
   Sort,
   Tooltip,
   UtilizationBar,
-  PAGINATION_VIEW
+  PAGINATION_VIEW,
+  DropdownButton,
+  MenuItem
 } from 'patternfly-react';
 import { formatDateTime } from '../../../../../../components/dates/MomentDate';
 import listFilter from '../listFilter';
@@ -233,6 +235,17 @@ class PlanRequestDetailList extends React.Component {
     );
   };
 
+  onSelect = (eventKey, task) => {
+    const { downloadLogAction } = this.props;
+    if (eventKey === 'migration') {
+      downloadLogAction(task);
+    } else if (eventKey === 'preMigration') {
+      console.log('Downloading a sweet pre-migration playbook log');
+    } else if (eventKey === 'postMigration') {
+      console.log('Downloading a sweet post-migration playbook log');
+    }
+  };
+
   render() {
     const {
       activeFilters,
@@ -432,15 +445,22 @@ class PlanRequestDetailList extends React.Component {
                         <span id="downloadLogInProgress">{__('Download log in progress...')}</span>
                       </label>
                     ) : (
-                      <a
-                        href="#"
-                        onClick={e => {
-                          e.preventDefault();
-                          downloadLogAction(task);
-                        }}
+                      <DropdownButton
+                        id={`${task.id}-${
+                          task.descriptionPrefix
+                        }_download_log_dropdown`}
+                        title="Download Log"
+                        pullRight
+                        onSelect={eventKey => this.onSelect(eventKey, task)}
                       >
-                        {__('Download Log')}
-                      </a>
+                        <MenuItem eventKey="preMigration">
+                          Pre-migration log
+                        </MenuItem>
+                        <MenuItem eventKey="migration">Migration log</MenuItem>
+                        <MenuItem eventKey="postMigration">
+                          Post-migration log
+                        </MenuItem>
+                      </DropdownButton>
                     )
                   }
                   stacked
