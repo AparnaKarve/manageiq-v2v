@@ -446,20 +446,18 @@ class PlanRequestDetailList extends React.Component {
                       </label>
                     ) : (
                       <DropdownButton
-                        id={`${task.id}-${
-                          task.descriptionPrefix
-                        }_download_log_dropdown`}
+                        id={`${task.id}-${task.descriptionPrefix}_download_log_dropdown`}
                         title="Download Log"
                         pullRight
                         onSelect={eventKey => this.onSelect(eventKey, task)}
                       >
-                        <MenuItem eventKey="preMigration">
-                          Pre-migration log
-                        </MenuItem>
+                        {task.options.showPreMigrationOption && (
+                          <MenuItem eventKey="preMigration">Pre-migration log</MenuItem>
+                        )}
                         <MenuItem eventKey="migration">Migration log</MenuItem>
-                        <MenuItem eventKey="postMigration">
-                          Post-migration log
-                        </MenuItem>
+                        {task.options.showPostMigrationOption && (
+                          <MenuItem eventKey="postMigration">Post-migration log</MenuItem>
+                        )}
                       </DropdownButton>
                     )
                   }
