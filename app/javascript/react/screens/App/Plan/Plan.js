@@ -111,7 +111,9 @@ class Plan extends React.Component {
       downloadLogAction,
       downloadLogInProgressTaskIds,
       fetchAnsiblePlaybookTemplateAction,
-      fetchPlanUrl
+      fetchPlanUrl,
+      isFetchingAnsiblePlaybookTemplate,
+      ansiblePlaybookTemplate
     } = this.props;
 
     const {
@@ -163,6 +165,8 @@ class Plan extends React.Component {
                 downloadLogInProgressTaskIds={downloadLogInProgressTaskIds}
                 fetchAnsiblePlaybookTemplateAction={fetchAnsiblePlaybookTemplateAction}
                 fetchAnsiblePlaybookTemplateUrl={fetchPlanUrl}
+                isFetchingAnsiblePlaybookTemplate={isFetchingAnsiblePlaybookTemplate}
+                ansiblePlaybookTemplate={ansiblePlaybookTemplate}
               />
             )}
           {!planNotStarted &&

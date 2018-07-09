@@ -270,7 +270,12 @@ class PlanRequestDetailList extends React.Component {
       pageChangeValue
     } = this.state;
 
-    const { downloadLogAction, downloadLogInProgressTaskIds } = this.props;
+    const {
+      downloadLogAction,
+      downloadLogInProgressTaskIds,
+      isFetchingAnsiblePlaybookTemplate,
+      ansiblePlaybookTemplate
+    } = this.props;
 
     const paginatedSortedFiltersTasks = this.filterSortPaginatePlanRequestTasks();
 
@@ -373,11 +378,18 @@ class PlanRequestDetailList extends React.Component {
                       <b>{__('Elapsed Time')}: </b>
                       {formatDateTime(task.startDateTime)}
                     </div>
-                    <div>
-                      <b>{__('Description')}: </b>
-                      {task.options.progress &&
-                        V2V_MIGRATION_STATUS_MESSAGES[task.options.progress.current_description]}
-                    </div>
+                    {task.options.prePlaybookRunning || task.options.postPlaybookRunning ? (
+                      <div>
+                        <b>{__('Running playbook service: ')}</b>
+                        {ansiblePlaybookTemplate.name}
+                      </div>
+                    ) : (
+                      <div>
+                        <b>{__('Description')}</b>
+                        {task.options.progress &&
+                          V2V_MIGRATION_STATUS_MESSAGES[task.options.progress.current_description]}
+                      </div>
+                    )}
                     <div>
                       <b>{__('Conversion Host')}: </b>
                       {task.transformation_host_name}
@@ -414,8 +426,14 @@ class PlanRequestDetailList extends React.Component {
                         <span>{task.message}</span>
                         &nbsp;
                         {/* Todo: revisit FieldLevelHelp props in patternfly-react to support this */}
-                        <OverlayTrigger rootClose trigger="click" placement="left" overlay={popoverContent}>
-                          <Button bsStyle="link" onClick={() => this.overlayTriggerClick(task)}>
+                        <OverlayTrigger
+                          rootClose
+                          trigger="click"
+                          onEnter={() => this.overlayTriggerClick(task)}
+                          placement="left"
+                          overlay={popoverContent}
+                        >
+                          <Button bsStyle="link">
                             <Icon type="pf" name="info" />
                           </Button>
                         </OverlayTrigger>
@@ -462,11 +480,11 @@ class PlanRequestDetailList extends React.Component {
                         pullRight
                         onSelect={eventKey => this.onSelect(eventKey, task)}
                       >
-                        {task.options.showPreMigrationOption && (
+                        {(task.options.prePlaybookRunning || task.options.prePlaybookComplete) && (
                           <MenuItem eventKey="preMigration">Pre-migration log</MenuItem>
                         )}
                         <MenuItem eventKey="migration">Migration log</MenuItem>
-                        {task.options.showPostMigrationOption && (
+                        {(task.options.postPlaybookRunning || task.options.postPlaybookComplete) && (
                           <MenuItem eventKey="postMigration">Post-migration log</MenuItem>
                         )}
                       </DropdownButton>
