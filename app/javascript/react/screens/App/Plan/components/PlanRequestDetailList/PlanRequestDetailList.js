@@ -246,6 +246,17 @@ class PlanRequestDetailList extends React.Component {
     }
   };
 
+  overlayTriggerClick = task => {
+    const playbookStatuses = Object.keys(task.options.playbooks).map(
+      playbookType => task.options.playbooks[playbookType]
+    );
+    const isRunningPlaybook = playbookStatuses.find(playbook => playbook.job_status === 'running');
+    if (isRunningPlaybook) {
+      const { fetchAnsiblePlaybookTemplateAction, fetchAnsiblePlaybookTemplateUrl } = this.props;
+      fetchAnsiblePlaybookTemplateAction(fetchAnsiblePlaybookTemplateUrl, isRunningPlaybook.job_id);
+    }
+  };
+
   render() {
     const {
       activeFilters,
@@ -404,7 +415,7 @@ class PlanRequestDetailList extends React.Component {
                         &nbsp;
                         {/* Todo: revisit FieldLevelHelp props in patternfly-react to support this */}
                         <OverlayTrigger rootClose trigger="click" placement="left" overlay={popoverContent}>
-                          <Button bsStyle="link">
+                          <Button bsStyle="link" onClick={() => this.overlayTriggerClick(task)}>
                             <Icon type="pf" name="info" />
                           </Button>
                         </OverlayTrigger>

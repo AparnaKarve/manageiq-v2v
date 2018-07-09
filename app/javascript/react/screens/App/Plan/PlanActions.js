@@ -10,12 +10,26 @@ import {
   RESET_PLAN_STATE,
   FETCH_V2V_MIGRATION_TASK_LOG,
   DOWNLOAD_LOG_CLICKED,
-  DOWNLOAD_LOG_COMPLETED
+  DOWNLOAD_LOG_COMPLETED,
+  FETCH_V2V_ANSIBLE_PLAYBOOK_TEMPLATE
 } from './PlanConstants';
 
 import { V2V_NOTIFICATION_ADD } from '../common/NotificationList/NotificationConstants';
 
-import { migrationPlan, requestWithTasks } from './playbooks.fixtures';
+import { migrationPlan, requestWithTasks, playbooksStore } from './playbooks.fixtures';
+
+// *****************************************************************************
+// * FETCH_V2V_ANSIBLE_PLAYBOOK_TEMPLATE
+// *****************************************************************************
+const _getAnsiblePlaybookTemplateActionCreator = url => ({
+  type: FETCH_V2V_ANSIBLE_PLAYBOOK_TEMPLATE,
+  payload: Promise.resolve({ data: playbooksStore[url] })
+});
+
+export const fetchAnsiblePlaybookTemplateAction = (url, id) => {
+  const uri = new URI(`${url}/${id}`);
+  return _getAnsiblePlaybookTemplateActionCreator(uri.toString());
+};
 
 // *****************************************************************************
 // * FETCH_V2V_ALL_REQUESTS_WITH_TASKS_FOR_PLAN

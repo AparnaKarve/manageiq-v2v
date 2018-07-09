@@ -109,7 +109,9 @@ class Plan extends React.Component {
       isQueryingVms,
       isRejectedVms,
       downloadLogAction,
-      downloadLogInProgressTaskIds
+      downloadLogInProgressTaskIds,
+      fetchAnsiblePlaybookTemplateAction,
+      fetchPlanUrl
     } = this.props;
 
     const {
@@ -159,6 +161,8 @@ class Plan extends React.Component {
                 planRequestTasks={planRequestTasksMutable}
                 downloadLogAction={downloadLogAction}
                 downloadLogInProgressTaskIds={downloadLogInProgressTaskIds}
+                fetchAnsiblePlaybookTemplateAction={fetchAnsiblePlaybookTemplateAction}
+                fetchAnsiblePlaybookTemplateUrl={fetchPlanUrl}
               />
             )}
           {!planNotStarted &&

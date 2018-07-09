@@ -12,6 +12,7 @@ import {
   FETCH_V2V_MIGRATION_TASK_LOG,
   DOWNLOAD_LOG_CLICKED,
   DOWNLOAD_LOG_COMPLETED,
+  FETCH_V2V_ANSIBLE_PLAYBOOK_TEMPLATE,
   V2V_MIGRATION_STATUS_MESSAGES,
   STATUS_MESSAGE_KEYS
 } from './PlanConstants';
@@ -31,7 +32,11 @@ export const initialState = Immutable({
   isQueryingVms: false,
   isRejectedVms: false,
   errorVms: null,
-  vms: []
+  vms: [],
+  isFetchingAnsiblePlaybookTemplate: false,
+  isRejectedAnsiblePlaybookTemplate: false,
+  errorAnsiblePlaybookTemplate: null,
+  ansiblePlaybookTemplate: {}
 });
 
 const excludeDownloadDoneTaskId = (allDownloadLogInProgressTaskIds, taskId) =>
@@ -197,6 +202,20 @@ export default (state = initialState, action) => {
         .set('isFetchingMigrationTaskLog', false)
         .set('isRejectedMigrationTaskLog', true)
         .set('errorMigrationTaskLog', action.payload);
+
+    case `${FETCH_V2V_ANSIBLE_PLAYBOOK_TEMPLATE}_PENDING`:
+      return state.set('isFetchingAnsiblePlaybookTemplate', true).set('isRejectedAnsiblePlaybookTemplate', false);
+    case `${FETCH_V2V_ANSIBLE_PLAYBOOK_TEMPLATE}_FULFILLED`:
+      return state
+        .set('ansiblePlaybookTemplate', action.payload.data)
+        .set('isFetchingAnsiblePlaybookTemplate', false)
+        .set('isRejectedAnsiblePlaybookTemplate', false)
+        .set('errorAnsiblePlaybookTemplate', null);
+    case `${FETCH_V2V_ANSIBLE_PLAYBOOK_TEMPLATE}_REJECTED`:
+      return state
+        .set('isFetchingAnsiblePlaybookTemplate', false)
+        .set('isRejectedAnsiblePlaybookTemplate', true)
+        .set('errorAnsiblePlaybookTemplate', action.payload);
 
     case DOWNLOAD_LOG_CLICKED:
       return state.set(
