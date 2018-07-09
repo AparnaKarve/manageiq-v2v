@@ -57,15 +57,12 @@ const processVMTasks = vmTasks => {
       options: {}
     };
 
-    const progressStates = [];
-    if (task.options.progress.states) {
-      for (const state in task.options.progress.states) {
-        progressStates.push(task.options.progress.states[state].description);
-      }
-    }
-
-    taskDetails.options.showPreMigrationOption = progressStates.includes('<PRE_MIGRATION_PLAYBOOK_DESCRIPTION>');
-    taskDetails.options.showPostMigrationOption = progressStates.includes('<POST_MIGRATION_PLAYBOOK_DESCRIPTION>');
+    taskDetails.options.showPreMigrationOption =
+      task.options.playbooks.pre &&
+      (task.options.playbooks.pre.job_status === 'complete' || task.options.playbooks.pre.job_status === 'running');
+    taskDetails.options.showPostMigrationOption =
+      task.options.playbooks.post &&
+      (task.options.playbooks.post.job_status === 'complete' || task.options.playbooks.post.job_status === 'running');
     taskDetails.options.progress = task.options.progress;
     taskDetails.options.virtv2v_wrapper = task.options.virtv2v_wrapper;
 
