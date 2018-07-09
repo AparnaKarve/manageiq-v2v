@@ -80,14 +80,24 @@ export const requestWithTasks = {
         workflow_settings: {
           resource_action_id: '11'
         },
+        playbooks: {
+          pre: {
+            job_id: '43',
+            job_status: 'complete'
+          },
+          post: {
+            job_id: '4',
+            job_status: 'running'
+          }
+        },
         initiator: null,
         src_id: '1',
         cart_state: 'ordered',
         requester_group: 'EvmGroup-super_administrator',
         delivered_on: '2018-05-04T19:03:21.606Z',
         progress: {
-          current_description: '<POST_MIGRATION_PLAYBOOK_DESCRIPTION>',
-          current_state: '/State8',
+          current_description: 'Virtual machine migrated',
+          current_state: '/State7',
           percent: 100,
           states: {
             '/State1': {
@@ -214,13 +224,6 @@ export const requestWithTasks = {
               message: 'Virtual machine migrated',
               started_on: '2018-05-04T19:13:55Z',
               percent: 0
-            },
-            '/State8': {
-              status: 'active',
-              weight: 1,
-              description: '<POST_MIGRATION_PLAYBOOK_DESCRIPTION>',
-              started_on: '2018-05-04T19:13:55Z',
-              percent: 0
             }
           }
         },
@@ -280,6 +283,7 @@ export const requestWithTasks = {
         workflow_settings: {
           resource_action_id: '32'
         },
+        playbooks: {},
         initiator: null,
         src_id: '1',
         cart_state: 'ordered',
@@ -364,6 +368,16 @@ export const requestWithTasks = {
         dialog: null,
         workflow_settings: {
           resource_action_id: '32'
+        },
+        playbooks: {
+          pre: {
+            job_id: '43',
+            job_status: 'running'
+          },
+          post: {
+            job_id: '4',
+            job_status: '<PLAYBOOK_RUN_PENDING>'
+          }
         },
         initiator: null,
         src_id: '1',
