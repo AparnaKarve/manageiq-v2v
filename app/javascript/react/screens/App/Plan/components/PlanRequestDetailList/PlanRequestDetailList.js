@@ -476,16 +476,16 @@ class PlanRequestDetailList extends React.Component {
                     ) : (
                       <DropdownButton
                         id={`${task.id}-${task.descriptionPrefix}_download_log_dropdown`}
-                        title="Download Log"
+                        title={__('Download Log')}
                         pullRight
                         onSelect={eventKey => this.onSelect(eventKey, task)}
                       >
                         {(task.options.prePlaybookRunning || task.options.prePlaybookComplete) && (
-                          <MenuItem eventKey="preMigration">Pre-migration log</MenuItem>
+                          <MenuItem eventKey="preMigration">{__('Pre-migration log')}</MenuItem>
                         )}
                         <MenuItem eventKey="migration">Migration log</MenuItem>
                         {(task.options.postPlaybookRunning || task.options.postPlaybookComplete) && (
-                          <MenuItem eventKey="postMigration">Post-migration log</MenuItem>
+                          <MenuItem eventKey="postMigration">{__('Post-migration log')}</MenuItem>
                         )}
                       </DropdownButton>
                     )
