@@ -6,7 +6,7 @@ export const migrationPlan = {
       transformation_mapping_id: '1',
       pre_service_id: '43',
       post_service_id: '4',
-      tasks: [
+      actions: [
         { vm_id: '1', pre_service: true, post_service: true },
         { vm_id: '2', pre_service: false, post_service: false },
         { vm_id: '3', pre_service: true, post_service: true }

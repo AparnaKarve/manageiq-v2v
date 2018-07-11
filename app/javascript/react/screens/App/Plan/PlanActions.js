@@ -52,7 +52,7 @@ export const fetchAnsiblePlaybookTemplateAction = (url, id) => {
 
 const _getTasksForAllRequestsForPlanActionCreator = url => dispatch =>
   dispatch({
-    type: FETCH_V2V_PLAN_REQUEST,
+    type: FETCH_V2V_ALL_REQUESTS_WITH_TASKS_FOR_PLAN,
     payload: Promise.resolve({ data: { results: [requestWithTasks] } })
   });
 
