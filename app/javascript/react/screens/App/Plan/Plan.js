@@ -99,6 +99,7 @@ class Plan extends React.Component {
 
   render() {
     const {
+      plan,
       planName,
       planArchived,
       planRequestFailed,
@@ -159,6 +160,7 @@ class Plan extends React.Component {
             !isRejectedPlanRequest &&
             planRequestTasksMutable.length > 0 && (
               <PlanRequestDetailList
+                plan={plan}
                 planFinished={planFinished}
                 planRequestTasks={planRequestTasksMutable}
                 downloadLogAction={downloadLogAction}
