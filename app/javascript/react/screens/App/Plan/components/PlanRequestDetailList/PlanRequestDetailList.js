@@ -395,12 +395,12 @@ class PlanRequestDetailList extends React.Component {
                     </div>
                     {task.options.prePlaybookRunning || task.options.postPlaybookRunning ? (
                       <div>
-                        <b>{__('Running playbook service: ')}</b>
+                        <b>{__('Running playbook service')}: </b>
                         {ansiblePlaybookTemplate.name}
                       </div>
                     ) : (
                       <div>
-                        <b>{__('Description')}</b>
+                        <b>{__('Description')}: </b>
                         {task.options.progress &&
                           V2V_MIGRATION_STATUS_MESSAGES[task.options.progress.current_description]}
                       </div>
