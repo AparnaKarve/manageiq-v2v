@@ -345,7 +345,7 @@ export const requestWithTasks = {
       },
       created_on: '2018-05-07T20:07:33Z',
       updated_on: '2018-05-09T00:21:38Z',
-      message: 'Convert Disks',
+      message: 'Power off',
       status: 'Ok',
       type: 'ServiceTemplateTransformationPlanTask',
       miq_request_id: '1',
