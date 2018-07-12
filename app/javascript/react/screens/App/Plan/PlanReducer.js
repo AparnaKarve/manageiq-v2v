@@ -62,15 +62,20 @@ const processVMTasks = vmTasks => {
       options: {}
     };
 
-    taskDetails.options.prePlaybookRunning =
-      task.options.playbooks.pre && task.options.playbooks.pre.job_status === 'running';
-    taskDetails.options.postPlaybookRunning =
-      task.options.playbooks.post && task.options.playbooks.post.job_status === 'running';
-    taskDetails.options.prePlaybookComplete =
-      task.options.playbooks.pre && task.options.playbooks.pre.job_status === 'complete';
-    taskDetails.options.postPlaybookComplete =
-      task.options.playbooks.post && task.options.playbooks.post.job_status === 'complete';
-    taskDetails.options.playbooks = task.options.playbooks;
+    const hasPlaybookService = task.options.playbooks;
+
+    if (hasPlaybookService) {
+      taskDetails.options.prePlaybookRunning =
+        task.options.playbooks.pre && task.options.playbooks.pre.job_state === 'active';
+      taskDetails.options.postPlaybookRunning =
+        task.options.playbooks.post && task.options.playbooks.post.job_state === 'active';
+      taskDetails.options.prePlaybookComplete =
+        task.options.playbooks.pre && task.options.playbooks.pre.job_state === 'finished';
+      taskDetails.options.postPlaybookComplete =
+        task.options.playbooks.post && task.options.playbooks.post.job_state === 'finished';
+      taskDetails.options.playbooks = task.options.playbooks;
+    }
+
     taskDetails.options.progress = task.options.progress;
     taskDetails.options.virtv2v_wrapper = task.options.virtv2v_wrapper;
 
