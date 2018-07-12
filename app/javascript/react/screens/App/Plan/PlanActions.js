@@ -21,6 +21,12 @@ import { migrationPlan, requestWithTasks, playbooksStore } from './playbooks.fix
 // *****************************************************************************
 // * FETCH_V2V_ANSIBLE_PLAYBOOK_TEMPLATE
 // *****************************************************************************
+// const _getAnsiblePlaybookTemplateActionCreator = url => dispatch =>
+//   dispatch({
+//     type: FETCH_V2V_ANSIBLE_PLAYBOOK_TEMPLATE,
+//     payload: API.get(url)
+//   });
+
 const _getAnsiblePlaybookTemplateActionCreator = url => ({
   type: FETCH_V2V_ANSIBLE_PLAYBOOK_TEMPLATE,
   payload: Promise.resolve({ data: playbooksStore[url] })
