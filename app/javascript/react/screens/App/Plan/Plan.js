@@ -113,7 +113,6 @@ class Plan extends React.Component {
       downloadLogInProgressTaskIds,
       fetchAnsiblePlaybookTemplateAction,
       fetchPlanUrl,
-      isFetchingAnsiblePlaybookTemplate,
       ansiblePlaybookTemplate
     } = this.props;
 
@@ -167,7 +166,6 @@ class Plan extends React.Component {
                 downloadLogInProgressTaskIds={downloadLogInProgressTaskIds}
                 fetchAnsiblePlaybookTemplateAction={fetchAnsiblePlaybookTemplateAction}
                 fetchAnsiblePlaybookTemplateUrl={fetchPlanUrl}
-                isFetchingAnsiblePlaybookTemplate={isFetchingAnsiblePlaybookTemplate}
                 ansiblePlaybookTemplate={ansiblePlaybookTemplate}
               />
             )}
@@ -227,7 +225,10 @@ Plan.propTypes = {
   isRejectedVms: PropTypes.bool,
   resetPlanStateAction: PropTypes.func,
   downloadLogAction: PropTypes.func,
-  downloadLogInProgressTaskIds: PropTypes.array
+  downloadLogInProgressTaskIds: PropTypes.array,
+  plan: PropTypes.object,
+  fetchAnsiblePlaybookTemplateAction: PropTypes.func,
+  ansiblePlaybookTemplate: PropTypes.object
 };
 Plan.defaultProps = {
   planName: '',

@@ -251,7 +251,7 @@ class PlanRequestDetailList extends React.Component {
       const playbookStatuses = task.options.playbooks;
       let runningPlaybook;
 
-      for (let scheduleType in playbookStatuses) {
+      for (const scheduleType in playbookStatuses) {
         if (playbookStatuses[scheduleType].job_state === 'active') {
           runningPlaybook = scheduleType;
         }
@@ -285,12 +285,7 @@ class PlanRequestDetailList extends React.Component {
       pageChangeValue
     } = this.state;
 
-    const {
-      downloadLogAction,
-      downloadLogInProgressTaskIds,
-      isFetchingAnsiblePlaybookTemplate,
-      ansiblePlaybookTemplate
-    } = this.props;
+    const { downloadLogInProgressTaskIds, ansiblePlaybookTemplate } = this.props;
 
     const paginatedSortedFiltersTasks = this.filterSortPaginatePlanRequestTasks();
 
@@ -535,7 +530,11 @@ class PlanRequestDetailList extends React.Component {
 PlanRequestDetailList.propTypes = {
   planRequestTasks: PropTypes.array,
   downloadLogAction: PropTypes.func,
-  downloadLogInProgressTaskIds: PropTypes.array
+  downloadLogInProgressTaskIds: PropTypes.array,
+  plan: PropTypes.object,
+  fetchAnsiblePlaybookTemplateUrl: PropTypes.string,
+  fetchAnsiblePlaybookTemplateAction: PropTypes.func,
+  ansiblePlaybookTemplate: PropTypes.object
 };
 
 export default PlanRequestDetailList;
