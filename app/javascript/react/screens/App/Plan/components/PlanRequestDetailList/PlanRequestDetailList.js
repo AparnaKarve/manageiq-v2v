@@ -247,13 +247,15 @@ class PlanRequestDetailList extends React.Component {
   };
 
   overlayTriggerClick = task => {
-    const playbookStatuses = Object.keys(task.options.playbooks).map(
-      playbookType => task.options.playbooks[playbookType]
-    );
-    const isRunningPlaybook = playbookStatuses.find(playbook => playbook.job_status === 'running');
-    if (isRunningPlaybook) {
-      const { fetchAnsiblePlaybookTemplateAction, fetchAnsiblePlaybookTemplateUrl } = this.props;
-      fetchAnsiblePlaybookTemplateAction(fetchAnsiblePlaybookTemplateUrl, isRunningPlaybook.job_id);
+    if (task.options.playbooks) {
+      const playbookStatuses = Object.keys(task.options.playbooks).map(
+        playbookType => task.options.playbooks[playbookType]
+      );
+      const isRunningPlaybook = playbookStatuses.find(playbook => playbook.job_state === 'active');
+      if (isRunningPlaybook) {
+        const { fetchAnsiblePlaybookTemplateAction, fetchAnsiblePlaybookTemplateUrl } = this.props;
+        fetchAnsiblePlaybookTemplateAction(fetchAnsiblePlaybookTemplateUrl, isRunningPlaybook.job_id);
+      }
     }
   };
 
