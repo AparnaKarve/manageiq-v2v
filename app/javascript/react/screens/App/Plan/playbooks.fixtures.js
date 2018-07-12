@@ -83,11 +83,13 @@ export const requestWithTasks = {
         playbooks: {
           pre: {
             job_id: '43',
-            job_status: 'complete'
+            job_status: 'Ok',
+            job_state: 'finished'
           },
           post: {
             job_id: '4',
-            job_status: 'running'
+            job_status: 'Ok',
+            job_state: 'active'
           }
         },
         initiator: null,
@@ -283,7 +285,6 @@ export const requestWithTasks = {
         workflow_settings: {
           resource_action_id: '32'
         },
-        playbooks: {},
         initiator: null,
         src_id: '1',
         cart_state: 'ordered',
@@ -372,11 +373,8 @@ export const requestWithTasks = {
         playbooks: {
           pre: {
             job_id: '43',
-            job_status: 'running'
-          },
-          post: {
-            job_id: '4',
-            job_status: '<PLAYBOOK_RUN_PENDING>'
+            job_status: 'ok',
+            job_state: 'active'
           }
         },
         initiator: null,
