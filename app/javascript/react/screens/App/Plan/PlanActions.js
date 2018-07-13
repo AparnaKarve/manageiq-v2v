@@ -17,83 +17,54 @@ import {
 
 import { V2V_NOTIFICATION_ADD } from '../common/NotificationList/NotificationConstants';
 
-import { migrationPlan, requestWithTasks, playbooksStore, orchestrationStackStore } from './playbooks.fixtures';
-
 // *****************************************************************************
 // * FETCH_V2FETCH_V2V_ORCHESTRATION_STACK
 // *****************************************************************************
-// const _getOrchestrationStackActionCreator = (url, playbookScheduleType, task) => dispatch => {
-//   dispatch({
-//     type: DOWNLOAD_LOG_CLICKED,
-//     payload: task.id
-//   });
-//
-//   return dispatch({
-//     type: FETCH_V2V_ORCHESTRATION_STACK,
-//     payload: new Promise((resolve, reject) =>
-//       API.get(url)
-//         .then(response => {
-//           resolve(response);
-//           dispatch({
-//             type: DOWNLOAD_LOG_COMPLETED,
-//             payload: task.id
-//           });
-//           const playbookLogFileName = `${task.vmName}-${playbookScheduleType}.log`;
-//           const file = new File([response.data.stdout], playbookLogFileName, { type: 'text/plain;charset=utf-8' });
-//           saveAs(file);
-//           const successMsg = sprintf(__('"%s" download successful'), playbookLogFileName);
-//           dispatch({
-//             type: V2V_NOTIFICATION_ADD,
-//             message: successMsg,
-//             notificationType: 'success',
-//             persistent: true,
-//             actionEnabled: false
-//           });
-//         })
-//         .catch(e => {
-//           dispatch({
-//             type: DOWNLOAD_LOG_COMPLETED,
-//             payload: task.id
-//           });
-//           dispatch({
-//             type: V2V_NOTIFICATION_ADD,
-//             message: e.error.message,
-//             notificationType: 'error',
-//             persistent: true,
-//             actionEnabled: false
-//           });
-//           reject(e);
-//         })
-//     )
-//   });
-// };
-
-const _getOrchestrationStackActionCreator = (url, playbookScheduleType, task) => dispatch =>
+const _getOrchestrationStackActionCreator = (url, playbookScheduleType, task) => dispatch => {
   dispatch({
-    type: FETCH_V2V_ORCHESTRATION_STACK,
-    payload: new Promise(resolve => {
-      dispatch({
-        type: DOWNLOAD_LOG_CLICKED,
-        payload: task.id
-      });
-      setTimeout(() => {
-        resolve({ data: orchestrationStackStore[url] });
-        dispatch({
-          type: DOWNLOAD_LOG_COMPLETED,
-          payload: task.id
-        });
-        const playbookLogFileName = `${task.vmName}-${playbookScheduleType}.log`;
-        const successMsg = sprintf(__('"%s" download successful'), playbookLogFileName);
-        dispatch({
-          type: V2V_NOTIFICATION_ADD,
-          message: successMsg,
-          notificationType: 'success',
-          persistent: true,
-          actionEnabled: false
-        });
-      }, 2000);
-    })
+    type: DOWNLOAD_LOG_CLICKED,
+    payload: task.id
   });
+
+  return dispatch({
+    type: FETCH_V2V_ORCHESTRATION_STACK,
+    payload: new Promise((resolve, reject) =>
+      API.get(url)
+        .then(response => {
+          resolve(response);
+          dispatch({
+            type: DOWNLOAD_LOG_COMPLETED,
+            payload: task.id
+          });
+          const playbookLogFileName = `${task.vmName}-${playbookScheduleType}.log`;
+          const file = new File([response.data.stdout], playbookLogFileName, { type: 'text/plain;charset=utf-8' });
+          saveAs(file);
+          const successMsg = sprintf(__('"%s" download successful'), playbookLogFileName);
+          dispatch({
+            type: V2V_NOTIFICATION_ADD,
+            message: successMsg,
+            notificationType: 'success',
+            persistent: true,
+            actionEnabled: false
+          });
+        })
+        .catch(e => {
+          dispatch({
+            type: DOWNLOAD_LOG_COMPLETED,
+            payload: task.id
+          });
+          dispatch({
+            type: V2V_NOTIFICATION_ADD,
+            message: e.error.message,
+            notificationType: 'error',
+            persistent: true,
+            actionEnabled: false
+          });
+          reject(e);
+        })
+    )
+  });
+};
 
 export const fetchOrchestrationStackAction = (url, playbookScheduleType, task) => {
   const [schedule] = playbookScheduleType.match(/pre|post/);
@@ -107,16 +78,11 @@ export const fetchOrchestrationStackAction = (url, playbookScheduleType, task) =
 // *****************************************************************************
 // * FETCH_V2V_ANSIBLE_PLAYBOOK_TEMPLATE
 // *****************************************************************************
-// const _getAnsiblePlaybookTemplateActionCreator = url => dispatch =>
-//   dispatch({
-//     type: FETCH_V2V_ANSIBLE_PLAYBOOK_TEMPLATE,
-//     payload: API.get(url)
-//   });
-
-const _getAnsiblePlaybookTemplateActionCreator = url => ({
-  type: FETCH_V2V_ANSIBLE_PLAYBOOK_TEMPLATE,
-  payload: Promise.resolve({ data: playbooksStore[url] })
-});
+const _getAnsiblePlaybookTemplateActionCreator = url => dispatch =>
+  dispatch({
+    type: FETCH_V2V_ANSIBLE_PLAYBOOK_TEMPLATE,
+    payload: API.get(url)
+  });
 
 export const fetchAnsiblePlaybookTemplateAction = (url, id) => {
   const uri = new URI(`${url}/${id}`);
@@ -126,27 +92,21 @@ export const fetchAnsiblePlaybookTemplateAction = (url, id) => {
 // *****************************************************************************
 // * FETCH_V2V_ALL_REQUESTS_WITH_TASKS_FOR_PLAN
 // *****************************************************************************
-// const _getTasksForAllRequestsForPlanActionCreator = (url, allRequests) => dispatch => {
-//   dispatch({
-//     type: FETCH_V2V_ALL_REQUESTS_WITH_TASKS_FOR_PLAN,
-//     payload: new Promise((resolve, reject) => {
-//       API.post(url, {
-//         action: 'query',
-//         resources: allRequests
-//       })
-//         .then(response => {
-//           resolve(response);
-//         })
-//         .catch(e => reject(e));
-//     })
-//   })
-// }
-
-const _getTasksForAllRequestsForPlanActionCreator = url => dispatch =>
+const _getTasksForAllRequestsForPlanActionCreator = (url, allRequests) => dispatch => {
   dispatch({
     type: FETCH_V2V_ALL_REQUESTS_WITH_TASKS_FOR_PLAN,
-    payload: Promise.resolve({ data: { results: [requestWithTasks] } })
+    payload: new Promise((resolve, reject) => {
+      API.post(url, {
+        action: 'query',
+        resources: allRequests
+      })
+        .then(response => {
+          resolve(response);
+        })
+        .catch(e => reject(e));
+    })
   });
+};
 
 export const fetchTasksForAllRequestsForPlanAction = (url, allRequests) =>
   _getTasksForAllRequestsForPlanActionCreator(url, allRequests);
@@ -173,23 +133,18 @@ export const queryPlanVmsAction = ids => _queryPlanVmsActionCreator(ids);
 // *****************************************************************************
 // * FETCH_V2V_PLAN
 // *****************************************************************************
-// export const _getPlanActionCreator = url => dispatch =>
-//   dispatch({
-//     type: FETCH_V2V_PLAN,
-//     payload: new Promise((resolve, reject) => {
-//       API.get(url)
-//         .then(response => {
-//           resolve(response);
-//         })
-//         .catch(e => {
-//           reject(e);
-//         });
-//     })
-//   });
 export const _getPlanActionCreator = url => dispatch =>
   dispatch({
     type: FETCH_V2V_PLAN,
-    payload: Promise.resolve({ data: migrationPlan })
+    payload: new Promise((resolve, reject) => {
+      API.get(url)
+        .then(response => {
+          resolve(response);
+        })
+        .catch(e => {
+          reject(e);
+        });
+    })
   });
 
 export const fetchPlanAction = (url, id) => {
