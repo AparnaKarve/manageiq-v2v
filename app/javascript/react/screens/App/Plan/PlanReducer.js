@@ -14,7 +14,8 @@ import {
   DOWNLOAD_LOG_COMPLETED,
   FETCH_V2V_ANSIBLE_PLAYBOOK_TEMPLATE,
   V2V_MIGRATION_STATUS_MESSAGES,
-  STATUS_MESSAGE_KEYS
+  STATUS_MESSAGE_KEYS,
+  FETCH_V2V_ORCHESTRATION_STACK
 } from './PlanConstants';
 
 export const initialState = Immutable({
@@ -36,7 +37,11 @@ export const initialState = Immutable({
   isFetchingAnsiblePlaybookTemplate: false,
   isRejectedAnsiblePlaybookTemplate: false,
   errorAnsiblePlaybookTemplate: null,
-  ansiblePlaybookTemplate: {}
+  ansiblePlaybookTemplate: {},
+  isFetchingOrchestrationStack: false,
+  isRejectedOrchestrationStack: false,
+  errorOrchestrationStack: null,
+  orchestrationStack: {}
 });
 
 const excludeDownloadDoneTaskId = (allDownloadLogInProgressTaskIds, taskId) =>
@@ -224,6 +229,20 @@ export default (state = initialState, action) => {
         .set('isFetchingAnsiblePlaybookTemplate', false)
         .set('isRejectedAnsiblePlaybookTemplate', true)
         .set('errorAnsiblePlaybookTemplate', action.payload);
+
+    case `${FETCH_V2V_ORCHESTRATION_STACK}_PENDING`:
+      return state.set('isFetchingOrchestrationStack', true).set('isRejectedOrchestrationStack', false);
+    case `${FETCH_V2V_ORCHESTRATION_STACK}_FULFILLED`:
+      return state
+        .set('orchestrationStack', action.payload.data)
+        .set('isFetchingOrchestrationStack', false)
+        .set('isRejectedOrchestrationStack', false)
+        .set('errorOrchestrationStack', null);
+    case `${FETCH_V2V_ORCHESTRATION_STACK}_REJECTED`:
+      return state
+        .set('isFetchingOrchestrationStack', false)
+        .set('isRejectedOrchestrationStack', true)
+        .set('errorOrchestrationStack', action.payload);
 
     case DOWNLOAD_LOG_CLICKED:
       return state.set(

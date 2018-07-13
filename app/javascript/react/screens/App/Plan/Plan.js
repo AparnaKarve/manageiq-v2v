@@ -113,7 +113,10 @@ class Plan extends React.Component {
       downloadLogInProgressTaskIds,
       fetchAnsiblePlaybookTemplateAction,
       fetchPlanUrl,
-      ansiblePlaybookTemplate
+      ansiblePlaybookTemplate,
+      fetchOrchestrationStackUrl,
+      fetchOrchestrationStackAction,
+      orchestrationStack
     } = this.props;
 
     const {
@@ -167,6 +170,9 @@ class Plan extends React.Component {
                 fetchAnsiblePlaybookTemplateAction={fetchAnsiblePlaybookTemplateAction}
                 fetchAnsiblePlaybookTemplateUrl={fetchPlanUrl}
                 ansiblePlaybookTemplate={ansiblePlaybookTemplate}
+                fetchOrchestrationStackUrl={fetchOrchestrationStackUrl}
+                fetchOrchestrationStackAction={fetchOrchestrationStackAction}
+                orchestrationStack={orchestrationStack}
               />
             )}
           {!planNotStarted &&
@@ -228,7 +234,10 @@ Plan.propTypes = {
   downloadLogInProgressTaskIds: PropTypes.array,
   plan: PropTypes.object,
   fetchAnsiblePlaybookTemplateAction: PropTypes.func,
-  ansiblePlaybookTemplate: PropTypes.object
+  ansiblePlaybookTemplate: PropTypes.object,
+  fetchOrchestrationStackUrl: PropTypes.string,
+  fetchOrchestrationStackAction: PropTypes.func,
+  orchestrationStack: PropTypes.object
 };
 Plan.defaultProps = {
   planName: '',

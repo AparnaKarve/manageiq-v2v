@@ -82,12 +82,12 @@ export const requestWithTasks = {
         },
         playbooks: {
           pre: {
-            job_id: '43',
+            job_id: '1101',
             job_status: 'Ok',
             job_state: 'finished'
           },
           post: {
-            job_id: '4',
+            job_id: '1101',
             job_status: 'Ok',
             job_state: 'active'
           }
@@ -372,7 +372,7 @@ export const requestWithTasks = {
         },
         playbooks: {
           pre: {
-            job_id: '43',
+            job_id: '1101',
             job_status: 'ok',
             job_state: 'active'
           }
@@ -574,6 +574,39 @@ export const postMigrationPlaybook = {
   tenant_id: '1',
   generic_subtype: null,
   deleted_on: null
+};
+
+export const orchestrationStack = {
+  href: 'http://localhost:3000/api/orchestration_stacks/1101',
+  id: '1101',
+  name: 'miq_New OpenShift Project_provision',
+  type: 'ManageIQ::Providers::EmbeddedAnsible::AutomationManager::Job',
+  description: null,
+  status: 'failed',
+  ems_ref: '108',
+  ancestry: null,
+  ems_id: '2',
+  orchestration_template_id: '296',
+  created_at: '2018-01-18T17:54:53Z',
+  updated_at: '2018-01-18T17:56:06Z',
+  retired: null,
+  retires_on: null,
+  retirement_warn: null,
+  retirement_last_warn: null,
+  retirement_state: null,
+  retirement_requester: null,
+  status_reason: null,
+  cloud_tenant_id: null,
+  resource_group: null,
+  start_time: '2018-01-18T17:54:53Z',
+  finish_time: '2018-01-18T17:55:00Z',
+  configuration_script_base_id: '294',
+  verbosity: 0,
+  hosts: ['ocp-master01']
+};
+
+export const orchestrationStackStore = {
+  [`/api/orchestration_stacks/${orchestrationStack.id}?attributes=stdout`]: orchestrationStack
 };
 
 export const playbooksStore = {

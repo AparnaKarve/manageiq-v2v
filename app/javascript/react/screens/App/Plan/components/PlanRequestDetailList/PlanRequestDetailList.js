@@ -236,13 +236,11 @@ class PlanRequestDetailList extends React.Component {
   };
 
   onSelect = (eventKey, task) => {
-    const { downloadLogAction } = this.props;
+    const { downloadLogAction, fetchOrchestrationStackUrl, fetchOrchestrationStackAction } = this.props;
     if (eventKey === 'migration') {
       downloadLogAction(task);
-    } else if (eventKey === 'preMigration') {
-      console.log('Downloading a sweet pre-migration playbook log');
-    } else if (eventKey === 'postMigration') {
-      console.log('Downloading a sweet post-migration playbook log');
+    } else {
+      fetchOrchestrationStackAction(fetchOrchestrationStackUrl, eventKey, task);
     }
   };
 
@@ -534,7 +532,9 @@ PlanRequestDetailList.propTypes = {
   plan: PropTypes.object,
   fetchAnsiblePlaybookTemplateUrl: PropTypes.string,
   fetchAnsiblePlaybookTemplateAction: PropTypes.func,
-  ansiblePlaybookTemplate: PropTypes.object
+  ansiblePlaybookTemplate: PropTypes.object,
+  fetchOrchestrationStackUrl: PropTypes.string,
+  fetchOrchestrationStackAction: PropTypes.func
 };
 
 export default PlanRequestDetailList;
