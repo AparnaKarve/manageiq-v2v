@@ -324,6 +324,8 @@ class PlanRequestDetailList extends React.Component {
 
     const paginatedSortedFiltersTasks = this.filterSortPaginatePlanRequestTasks();
 
+    const totalNumTasks = paginatedSortedFiltersTasks.itemCount;
+
     return (
       <React.Fragment>
         <Grid.Row>
@@ -380,6 +382,13 @@ class PlanRequestDetailList extends React.Component {
                 </Toolbar.Results>
               )}
           </Toolbar>
+          {selectedCancelTasks.length > 0 && (
+            <Toolbar>
+              <Toolbar.RightContent>
+                {sprintf(__('%s of %s selected'), selectedCancelTasks.length, totalNumTasks)}
+              </Toolbar.RightContent>
+            </Toolbar>
+          )}
         </Grid.Row>
         <div style={{ overflow: 'auto', paddingBottom: 300, height: '100%' }}>
           <ListView className="plan-request-details-list">
