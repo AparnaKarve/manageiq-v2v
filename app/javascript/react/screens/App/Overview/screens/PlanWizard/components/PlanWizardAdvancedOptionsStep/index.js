@@ -10,8 +10,11 @@ export const reducers = { planWizardAdvancedOptionsStep: reducer };
 const mapStateToProps = (
   {
     planWizardAdvancedOptionsStep,
-    planWizardVMStep: { valid_vms },
+    planWizardVMStep,
     form: {
+      planWizardGeneralStep: {
+        values: { vm_choice_radio }
+      },
       planWizardVMStep: {
         values: { selectedVms }
       },
@@ -19,12 +22,19 @@ const mapStateToProps = (
     }
   },
   ownProps
-) => ({
-  ...planWizardAdvancedOptionsStep,
-  ...ownProps.data,
-  advancedOptionsStepForm,
-  vmStepSelectedVms: getVMStepSelectedVms(valid_vms, selectedVms)
-});
+) => {
+  const allVms =
+    vm_choice_radio === 'vms_via_csv'
+      ? [...planWizardVMStep.valid_vms, ...planWizardVMStep.invalid_vms, ...planWizardVMStep.conflict_vms]
+      : planWizardVMStep.valid_vms;
+
+  return {
+    ...planWizardAdvancedOptionsStep,
+    ...ownProps.data,
+    advancedOptionsStepForm,
+    vmStepSelectedVms: getVMStepSelectedVms(allVms, selectedVms)
+  };
+};
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   ...stateProps,

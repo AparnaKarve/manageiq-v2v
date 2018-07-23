@@ -1,1 +1,1 @@
-export const getVMStepSelectedVms = (valid_vms, selectedVms) => valid_vms.filter(vm => selectedVms.includes(vm.id));
+export const getVMStepSelectedVms = (allVms, selectedVms) => allVms.filter(vm => selectedVms.includes(vm.id));
