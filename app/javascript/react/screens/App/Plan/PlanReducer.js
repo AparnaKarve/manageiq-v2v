@@ -149,6 +149,12 @@ const allVMTasksForRequestOfPlan = (requestWithTasks, actions) => {
   return processVMTasks(tasksOfPlan);
 };
 
+const incompleteCancellationTasks = (requestWithTasks, actions, tasksForCancel) => {
+  const tasksOfPlan = getMostRecentVMTasksFromRequests(requestWithTasks, actions);
+  const completedTasksOfPlan = tasksOfPlan.filter(task => task.state === 'finished');
+  return removeCancelledTasksFromSelection(tasksForCancel, completedTasksOfPlan);
+};
+
 export default (state = initialState, action) => {
   switch (action.type) {
     case `${FETCH_V2V_PLAN}_PENDING`:
@@ -175,6 +181,14 @@ export default (state = initialState, action) => {
           .set(
             'planRequestTasks',
             allVMTasksForRequestOfPlan(action.payload.data.results, state.plan.options.config_info.actions)
+          )
+          .set(
+            'selectedTasksForCancel',
+            incompleteCancellationTasks(
+              action.payload.data.results,
+              state.plan.options.config_info.actions,
+              state.selectedTasksForCancel
+            )
           )
           .set('allRequestsWithTasksForPlan', action.payload.data.results)
           .set('planRequestPreviouslyFetched', true)
