@@ -73,9 +73,7 @@ const processVMTasks = vmTasks => {
       transformation_host_name: task.options && task.options.transformation_host_name,
       delivered_on: new Date(task.options.delivered_on),
       updated_on: new Date(task.updated_on),
-      completed:
-        task.message === STATUS_MESSAGE_KEYS.VM_MIGRATIONS_COMPLETED ||
-        task.message === STATUS_MESSAGE_KEYS.VM_MIGRATIONS_FAILED,
+      completed: task.state === 'finished',
       state: task.state,
       status: task.status,
       options: {}
@@ -127,8 +125,8 @@ const processVMTasks = vmTasks => {
 
     if (taskDetails.completed) {
       taskDetails.completedSuccessfully =
-        task.options.progress.current_description === 'Virtual machine migrated' ||
-        task.options.progress.current_description === 'Mark source as migrated';
+        (task.options.progress && task.options.progress.current_description === 'Virtual machine migrated') ||
+        (task.options.progress && task.options.progress.current_description === 'Mark source as migrated');
     }
     if (task.options && task.options.virtv2v_disks && task.options.virtv2v_disks.length) {
       taskDetails.totalDiskSpace = task.options.virtv2v_disks.reduce((a, b) => a + b.size, 0);
