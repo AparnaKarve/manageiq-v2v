@@ -30,7 +30,7 @@ import {
   ACTIVE_PLAN_SORT_FIELDS,
   FINISHED_PLAN_SORT_FIELDS
 } from './PlanRequestDetailListConstants';
-import { V2V_MIGRATION_STATUS_MESSAGES } from '../../PlanConstants';
+import { V2V_MIGRATION_STATUS_MESSAGES, STATUS_MESSAGE_KEYS } from '../../PlanConstants';
 import TickingIsoElapsedTime from '../../../../../../components/dates/TickingIsoElapsedTime';
 import ConfirmModal from '../../../common/ConfirmModal';
 
@@ -67,6 +67,16 @@ class PlanRequestDetailList extends React.Component {
     // page input value
     pageChangeValue: 1
   };
+
+  componentDidUpdate() {
+    const {
+      failedMigrations,
+      successfulMigrations,
+      notificationsSentList,
+      dispatchVMTasksCompletionNotificationAction
+    } = this.props;
+    dispatchVMTasksCompletionNotificationAction(failedMigrations, successfulMigrations, notificationsSentList);
+  }
 
   onValueKeyPress = keyEvent => {
     const { currentValue, currentFilterType } = this.state;
@@ -344,6 +354,15 @@ class PlanRequestDetailList extends React.Component {
     this.setState({ showConfirmCancel: false });
   };
 
+  taskCompletedSuccessfully = task => task.message === STATUS_MESSAGE_KEYS.VM_MIGRATIONS_COMPLETED;
+
+  taskCompletedUnsuccessfully = task =>
+    task.message === STATUS_MESSAGE_KEYS.VM_MIGRATIONS_FAILED ||
+    task.message === STATUS_MESSAGE_KEYS.FAILED ||
+    (!V2V_MIGRATION_STATUS_MESSAGES[task.message] && task.state === 'finished');
+
+  taskCompleted = task => this.taskCompletedSuccessfully(task) || this.taskCompletedUnsuccessfully(task);
+
   render() {
     const {
       activeFilters,
@@ -463,6 +482,7 @@ class PlanRequestDetailList extends React.Component {
               let taskCancelled = false;
               let taskCancelling = false;
               let taskMessage = task.message;
+
               if (task.cancel_requested) {
                 taskCancelled = true;
               } else if (markedForCancellation.find(t => t.id === task.id)) {
@@ -705,7 +725,11 @@ PlanRequestDetailList.propTypes = {
   selectedTasksForCancel: PropTypes.array,
   updateSelectedTasksForCancelAction: PropTypes.func,
   deleteAllSelectedTasksForCancelAction: PropTypes.func,
-  markedForCancellation: PropTypes.array
+  markedForCancellation: PropTypes.array,
+  failedMigrations: PropTypes.array,
+  successfulMigrations: PropTypes.array,
+  notificationsSentList: PropTypes.array,
+  dispatchVMTasksCompletionNotificationAction: PropTypes.func
 };
 
 export default PlanRequestDetailList;

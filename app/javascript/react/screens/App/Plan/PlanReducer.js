@@ -14,12 +14,12 @@ import {
   DOWNLOAD_LOG_COMPLETED,
   FETCH_V2V_ANSIBLE_PLAYBOOK_TEMPLATE,
   V2V_MIGRATION_STATUS_MESSAGES,
-  STATUS_MESSAGE_KEYS,
   FETCH_V2V_ORCHESTRATION_STACK,
   REMOVE_TASKS_SELECTED_FOR_CANCELLATION,
   UPDATE_TASKS_SELECTED_FOR_CANCELLATION,
   DELETE_ALL_TASKS_SELECTED_FOR_CANCELLATION,
-  ADD_TASKS_TO_MARKED_FOR_CANCELLATION
+  ADD_TASKS_TO_MARKED_FOR_CANCELLATION,
+  ADD_TASK_TO_NOTIFICATION_SENT_LIST
 } from './PlanConstants';
 
 export const initialState = Immutable({
@@ -47,7 +47,10 @@ export const initialState = Immutable({
   errorOrchestrationStack: null,
   orchestrationStack: {},
   selectedTasksForCancel: [],
-  markedForCancellation: []
+  markedForCancellation: [],
+  failedMigrations: [],
+  successfulMigrations: [],
+  notificationsSentList: []
 });
 
 const excludeDownloadDoneTaskId = (allDownloadLogInProgressTaskIds, taskId) =>
@@ -61,6 +64,12 @@ const removeCancelledTasksFromSelection = (allSelectedTasksForCancel, alreadyCan
     alreadyCancelledTasks.every(cancelledTask => selectedTask.id !== cancelledTask.id)
   );
 
+const taskCompletedSuccessfully = task => task.state === 'finished' && task.status === 'Ok';
+
+const taskCompletedUnsuccessfully = task => task.state === 'finished' && task.status !== 'Ok';
+
+const taskCompleted = task => taskCompletedSuccessfully(task) || taskCompletedUnsuccessfully(task);
+
 const processVMTasks = vmTasks => {
   const tasks = [];
   vmTasks.forEach(task => {
@@ -70,11 +79,12 @@ const processVMTasks = vmTasks => {
       transformation_host_name: task.options && task.options.transformation_host_name,
       delivered_on: new Date(task.options.delivered_on),
       updated_on: new Date(task.updated_on),
-      completed:
-        task.message === STATUS_MESSAGE_KEYS.VM_MIGRATIONS_COMPLETED ||
-        task.message === STATUS_MESSAGE_KEYS.VM_MIGRATIONS_FAILED ||
-        task.message === STATUS_MESSAGE_KEYS.FAILED ||
-        (!V2V_MIGRATION_STATUS_MESSAGES[task.message] && task.state === 'finished'),
+      completed: taskCompleted(task),
+      // completed:
+      // task.message === STATUS_MESSAGE_KEYS.VM_MIGRATIONS_COMPLETED ||
+      // task.message === STATUS_MESSAGE_KEYS.VM_MIGRATIONS_FAILED ||
+      // task.message === STATUS_MESSAGE_KEYS.FAILED ||
+      // (!V2V_MIGRATION_STATUS_MESSAGES[task.message] && task.state === 'finished'),
       state: task.state,
       status: task.status,
       options: {},
@@ -153,6 +163,10 @@ const incompleteCancellationTasks = (requestWithTasks, actions, tasksForCancel) 
   return removeCancelledTasksFromSelection(tasksForCancel, completedTasksOfPlan);
 };
 
+const getFailedMigrations = vmTasks => vmTasks.filter(task => taskCompletedUnsuccessfully(task));
+
+const getSuccessfulMigrations = vmTasks => vmTasks.filter(task => taskCompletedSuccessfully(task));
+
 export default (state = initialState, action) => {
   switch (action.type) {
     case `${FETCH_V2V_PLAN}_PENDING`:
@@ -175,11 +189,12 @@ export default (state = initialState, action) => {
       return state.set('isFetchingPlanRequest', true).set('isRejectedPlanRequest', false);
     case `${FETCH_V2V_ALL_REQUESTS_WITH_TASKS_FOR_PLAN}_FULFILLED`:
       if (action.payload.data) {
+        const vmTasksForRequestOfPlan = allVMTasksForRequestOfPlan(
+          action.payload.data.results,
+          state.plan.options.config_info.actions
+        );
         return state
-          .set(
-            'planRequestTasks',
-            allVMTasksForRequestOfPlan(action.payload.data.results, state.plan.options.config_info.actions)
-          )
+          .set('planRequestTasks', vmTasksForRequestOfPlan)
           .set(
             'selectedTasksForCancel',
             incompleteCancellationTasks(
@@ -194,6 +209,8 @@ export default (state = initialState, action) => {
             'planRequestFailed',
             commonUtilitiesHelper.getMostRecentEntityByCreationDate(action.payload.data.results).status === 'Error'
           )
+          .set('failedMigrations', getFailedMigrations(vmTasksForRequestOfPlan))
+          .set('successfulMigrations', getSuccessfulMigrations(vmTasksForRequestOfPlan))
           .set('isRejectedPlanRequest', false)
           .set('errorPlanRequest', null)
           .set('isFetchingPlanRequest', false);
@@ -297,6 +314,9 @@ export default (state = initialState, action) => {
 
     case DELETE_ALL_TASKS_SELECTED_FOR_CANCELLATION:
       return state.set('selectedTasksForCancel', []);
+
+    case ADD_TASK_TO_NOTIFICATION_SENT_LIST:
+      return state.set('notificationsSentList', state.notificationsSentList.concat(action.payload));
 
     default:
       return state;
