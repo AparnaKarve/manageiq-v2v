@@ -30,7 +30,7 @@ import {
   ACTIVE_PLAN_SORT_FIELDS,
   FINISHED_PLAN_SORT_FIELDS
 } from './PlanRequestDetailListConstants';
-import { V2V_MIGRATION_STATUS_MESSAGES, STATUS_MESSAGE_KEYS } from '../../PlanConstants';
+import { V2V_MIGRATION_STATUS_MESSAGES } from '../../PlanConstants';
 import TickingIsoElapsedTime from '../../../../../../components/dates/TickingIsoElapsedTime';
 import ConfirmModal from '../../../common/ConfirmModal';
 
@@ -353,15 +353,6 @@ class PlanRequestDetailList extends React.Component {
     cancelPlanRequestTasksAction(cancelPlanRequestTasksUrl, selectedTasksForCancel);
     this.setState({ showConfirmCancel: false });
   };
-
-  taskCompletedSuccessfully = task => task.message === STATUS_MESSAGE_KEYS.VM_MIGRATIONS_COMPLETED;
-
-  taskCompletedUnsuccessfully = task =>
-    task.message === STATUS_MESSAGE_KEYS.VM_MIGRATIONS_FAILED ||
-    task.message === STATUS_MESSAGE_KEYS.FAILED ||
-    (!V2V_MIGRATION_STATUS_MESSAGES[task.message] && task.state === 'finished');
-
-  taskCompleted = task => this.taskCompletedSuccessfully(task) || this.taskCompletedUnsuccessfully(task);
 
   render() {
     const {

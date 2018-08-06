@@ -14,6 +14,7 @@ import {
   DOWNLOAD_LOG_COMPLETED,
   FETCH_V2V_ANSIBLE_PLAYBOOK_TEMPLATE,
   V2V_MIGRATION_STATUS_MESSAGES,
+  STATUS_MESSAGE_KEYS,
   FETCH_V2V_ORCHESTRATION_STACK,
   REMOVE_TASKS_SELECTED_FOR_CANCELLATION,
   UPDATE_TASKS_SELECTED_FOR_CANCELLATION,
@@ -79,12 +80,12 @@ const processVMTasks = vmTasks => {
       transformation_host_name: task.options && task.options.transformation_host_name,
       delivered_on: new Date(task.options.delivered_on),
       updated_on: new Date(task.updated_on),
-      completed: taskCompleted(task),
-      // completed:
-      // task.message === STATUS_MESSAGE_KEYS.VM_MIGRATIONS_COMPLETED ||
-      // task.message === STATUS_MESSAGE_KEYS.VM_MIGRATIONS_FAILED ||
-      // task.message === STATUS_MESSAGE_KEYS.FAILED ||
-      // (!V2V_MIGRATION_STATUS_MESSAGES[task.message] && task.state === 'finished'),
+      // completed: taskCompleted(task),
+      completed:
+      task.message === STATUS_MESSAGE_KEYS.VM_MIGRATIONS_COMPLETED ||
+      task.message === STATUS_MESSAGE_KEYS.VM_MIGRATIONS_FAILED ||
+      task.message === STATUS_MESSAGE_KEYS.FAILED ||
+      (!V2V_MIGRATION_STATUS_MESSAGES[task.message] && task.state === 'finished'),
       state: task.state,
       status: task.status,
       options: {},
