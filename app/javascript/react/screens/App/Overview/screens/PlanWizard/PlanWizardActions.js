@@ -26,6 +26,7 @@ export const planWizardExitedAction = () => dispatch => {
     type: V2V_VM_STEP_RESET
   });
   dispatch(reset('planWizardScheduleStep'));
+  dispatch(reset('planWizardInstancePropertiesStep'));
   dispatch(reset('planWizardAdvancedOptionsStep'));
   dispatch({
     type: RESET_V2V_ADVANCED_OPTIONS_STEP_VMS

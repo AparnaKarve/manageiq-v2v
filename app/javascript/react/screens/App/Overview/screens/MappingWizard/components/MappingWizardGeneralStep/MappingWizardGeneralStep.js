@@ -57,7 +57,7 @@ const MappingWizardGeneralStep = props => {
         controlWidth={9}
         inline_label
         onSelect={onSelect}
-        style={{ visibility: 'hidden' }}
+        // style={{ visibility: 'hidden' }}
       />
     </Form>
   );

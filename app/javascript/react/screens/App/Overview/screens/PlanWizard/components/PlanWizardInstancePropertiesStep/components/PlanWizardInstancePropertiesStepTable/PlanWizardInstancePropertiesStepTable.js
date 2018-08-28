@@ -5,10 +5,14 @@ import findIndex from 'lodash.findindex';
 import * as sort from 'sortabular';
 import * as resolve from 'table-resolver';
 import { compose } from 'recompose';
+import { reset } from 'redux-form';
 import { paginate, Grid, PaginationRow, Table, PAGINATION_VIEW, Icon, Button, FormControl } from 'patternfly-react';
 
+import { Field } from 'redux-form';
+import { BootstrapSelect } from '../../../../../../../common/forms/BootstrapSelect';
+
 // Temporary import while https://github.com/patternfly/patternfly-react/issues/535 is open:
-import TableInlineEditRow from './TableInlineEditRow/TableInlineEditRow';
+import TableInlineEditRow from '../TableInlineEditRow/TableInlineEditRow';
 
 class PlanWizardInstancePropertiesStepTable extends React.Component {
   state = {
@@ -49,17 +53,28 @@ class PlanWizardInstancePropertiesStepTable extends React.Component {
         const index = findIndex(rows, { id: rowData.id });
         const backup = rows[index];
 
+        const { savePreviousRowAction, instancePropertiesStepForm } = this.props;
+
+        const obj = {};
+        obj[`osp_security_group_${backup.id}`] = instancePropertiesStepForm.values[`osp_security_group_${backup.id}`];
+        obj[`osp_flavor_${backup.id}`] = instancePropertiesStepForm.values[`osp_flavor_${backup.id}`];
+        savePreviousRowAction(obj);
+
         this.setState({ backup, editing: true });
       },
       onConfirm: ({ rowData }) => {
         this.setState({ backup: {}, editing: false });
       },
       onCancel: ({ rowData }) => {
+        const { restorePreviousRowAction, previousRowForUndo } = this.props;
         this.setState({ backup: {}, editing: false });
+        restorePreviousRowAction(previousRowForUndo, rowData.id);
       },
       onChange: (value, { rowData, property }) => {}
     };
   };
+
+  flavorIdForVM = (bestFitFlavors, vmId) => bestFitFlavors.find(row => row.source_href === `vms/${vmId}`).best_fit.slice(8);
 
   inlineEditFormatter = Table.inlineEditFormatterFactory({
     isEditing: additionalData => this.inlineEditController().isEditing(additionalData),
@@ -69,7 +84,7 @@ class PlanWizardInstancePropertiesStepTable extends React.Component {
       </td>
     ),
     renderEdit: (value, additionalData) => {
-      const { tenantsWithAttributesById, destinationTenantIdsBySourceClusterId } = this.props;
+      const { tenantsWithAttributesById, destinationTenantIdsBySourceClusterId, bestFitFlavors, instancePropertiesStepForm } = this.props;
       const { optionsAttribute } = additionalData.column.cell.inlineEditSelect;
       const clusterId = additionalData.rowData.ems_cluster_id;
       const tenantId = destinationTenantIdsBySourceClusterId[clusterId];
@@ -77,17 +92,27 @@ class PlanWizardInstancePropertiesStepTable extends React.Component {
       const options = tenant ? tenant[optionsAttribute] : [];
       return (
         <td className="editable editing">
-          <FormControl
-            componentClass="select"
-            defaultValue={value.name}
-            onBlur={e => this.inlineEditController().onChange(e.target.value, additionalData)}
-          >
-            {options.map(opt => (
-              <option value={opt.name} key={opt.id}>
-                {opt.name}
-              </option>
-            ))}
-          </FormControl>
+
+          <Field
+            name={`${additionalData.column.property}_${additionalData.rowData.id}`}
+            // name={additionalData.column.property}
+            component={BootstrapSelect}
+            options={options}
+            option_key="id"
+            option_value="name"
+            form_name="PlanWizardInstancePropertiesStep"
+            pre_selected_value={additionalData.column.property === 'osp_flavor' ? instancePropertiesStepForm.values[`${additionalData.column.property}_${additionalData.rowData.id}`] || this.flavorIdForVM(bestFitFlavors, additionalData.rowData.id) : instancePropertiesStepForm.values[`${additionalData.column.property}_${additionalData.rowData.id}`]}
+            // label={__('Select pre-migration playbook service (optional)')}
+            // stacked_label
+            controlWidth={20}
+            // onBlur={e => this.inlineEditController().onChange(e.target.value, additionalData)}
+          />
+
+            {/*{options.map(opt => (*/}
+              {/*<option value={opt.name} key={opt.id}>*/}
+                {/*{opt.name}*/}
+              {/*</option>*/}
+            {/*))}*/}
         </td>
       );
     }
@@ -417,7 +442,12 @@ class PlanWizardInstancePropertiesStepTable extends React.Component {
 PlanWizardInstancePropertiesStepTable.propTypes = {
   rows: PropTypes.array,
   tenantsWithAttributesById: PropTypes.object,
-  destinationTenantIdsBySourceClusterId: PropTypes.object
+  destinationTenantIdsBySourceClusterId: PropTypes.object,
+  bestFitFlavors: PropTypes.array,
+  instancePropertiesStepForm: PropTypes.object,
+  savePreviousRowAction: PropTypes.func,
+  restorePreviousRowAction: PropTypes.func,
+  previousRowForUndo: PropTypes.object
 };
 PlanWizardInstancePropertiesStepTable.defaultProps = {
   rows: [],

@@ -22,12 +22,30 @@ export const getDestinationTenantIdsBySourceClusterId = transformation_mapping_i
   );
 };
 
-export const getVmsWithTargetClusterName = (vms, destinationTenantIdsBySourceClusterId, tenantsWithAttributesById) =>
+// const flavorIdForVM = (bestFitFlavors, vmId) => bestFitFlavors.find(row => row.source_href === `vms/${vmId}`).best_fit.slice(8);
+
+export const getVmsWithTargetClusterName = (vms, destinationTenantIdsBySourceClusterId, tenantsWithAttributesById, instancePropertiesStepForm) =>
   vms.map(vm => {
     const destinationTenantId = destinationTenantIdsBySourceClusterId[vm.ems_cluster_id];
     const tenant = destinationTenantId && tenantsWithAttributesById[destinationTenantId];
+
+    let flavorName = '';
+    let securityGroupName = '';
+
+    if (instancePropertiesStepForm && instancePropertiesStepForm.values && instancePropertiesStepForm.values[`osp_flavor_${vm.id}`]) {
+      const flavorId = instancePropertiesStepForm.values[`osp_flavor_${vm.id}`];
+      flavorName = tenant.flavors.find(flavor => flavor.id === flavorId).name;
+    }
+
+    if (instancePropertiesStepForm && instancePropertiesStepForm.values && instancePropertiesStepForm.values[`osp_security_group_${vm.id}`]) {
+      const securityGroupId = instancePropertiesStepForm.values[`osp_security_group_${vm.id}`];
+      securityGroupName = tenant.security_groups.find(security_group => security_group.id === securityGroupId).name;
+    }
     return {
       ...vm,
-      target_cluster_name: tenant ? tenant.name : ''
+      osp_security_group: {name: securityGroupName},
+      osp_flavor: {name: flavorName},
+      target_cluster_name: tenant ? tenant.name : '',
+      target_cluster_id: tenant ? tenant.id : ''
     };
   });
