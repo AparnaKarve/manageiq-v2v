@@ -45,6 +45,13 @@ const mapStateToProps = (
       osp_flavor: { name: 'medium' }
     })),
     selectedMapping
+    // initialValues: {
+    //   ospInstanceProperties: getVMStepSelectedVms(allVms, selectedVms).map(vm => ({
+    //     ...vm,
+    //     osp_security_group: { name: 'Default' },
+    //     osp_flavor: { name: 'medium' }
+    //   }))
+    // }
   };
 };
 

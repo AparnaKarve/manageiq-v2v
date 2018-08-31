@@ -50,40 +50,73 @@ class PlanWizardInstancePropertiesStepTable extends React.Component {
         const backup = rows[index];
 
         this.setState({ backup, editing: true });
+
+        const { setInstancePropertiesSingleRowAction } = this.props;
+        setInstancePropertiesSingleRowAction(rowData);
       },
       onConfirm: ({ rowData }) => {
         this.setState({ backup: {}, editing: false });
+
+        const { rows, updatedInstancePropertiesRow, instancePropertiesRowsAction } = this.props;
+        const updatedRows = rows.map(row => row.id === rowData.id ? updatedInstancePropertiesRow : row);
+        instancePropertiesRowsAction(updatedRows);
       },
       onCancel: ({ rowData }) => {
         this.setState({ backup: {}, editing: false });
       },
-      onChange: (value, { rowData, property }) => {}
+      onChange: (value, { rowData, property }) => {
+      }
     };
+  };
+
+  handleSelectChange = (e, additionalData) => {
+    console.log(e.target.value);
+    console.log(e.target.options[e.target.selectedIndex].text);
+
+    let updatedRowdata = '';
+    const { setInstancePropertiesSingleRowAction, updatedInstancePropertiesRow } = this.props;
+    const updatedInstanceProp = { ...additionalData.rowData[additionalData.property], name: e.target.options[e.target.selectedIndex].text, id: e.target.value};
+    if (additionalData.property === 'osp_security_group') {
+      updatedRowdata = {...updatedInstancePropertiesRow, osp_security_group: updatedInstanceProp};
+
+    } else if (additionalData.property === 'osp_flavor') {
+      updatedRowdata = {...updatedInstancePropertiesRow, osp_flavor: updatedInstanceProp};
+    }
+
+    // const updatedInstanceProp = { ...additionalData.rowData[additionalData.property], name: e.target.options[e.target.selectedIndex].text, id: e.target.value};
+    // const instanceProp = {};
+    // instanceProp[additionalData.property] = updatedInstanceProp;
+    // updatedRowdata = {...updatedInstancePropertiesRow, a: JSON.stringify(instanceProp)};
+
+    setInstancePropertiesSingleRowAction(updatedRowdata);
   };
 
   inlineEditFormatter = Table.inlineEditFormatterFactory({
     isEditing: additionalData => this.inlineEditController().isEditing(additionalData),
     renderValue: (value, additionalData) => (
       <td className="editable">
-        <span className="static">{value.name}</span>
+        {/*<span className="static">{value.name}</span>*/}
+        <span className="static">{additionalData.property === 'osp_security_group' ? additionalData.rowData.osp_security_group.name : additionalData.rowData.osp_flavor.name}</span>
       </td>
     ),
     renderEdit: (value, additionalData) => {
-      const { tenantsWithAttributesById, destinationTenantIdsBySourceClusterId } = this.props;
+      const { tenantsWithAttributesById, destinationTenantIdsBySourceClusterId, updatedInstancePropertiesRow } = this.props;
       const { optionsAttribute } = additionalData.column.cell.inlineEditSelect;
       const clusterId = additionalData.rowData.ems_cluster_id;
       const tenantId = destinationTenantIdsBySourceClusterId[clusterId];
       const tenant = tenantId && tenantsWithAttributesById[tenantId];
       const options = tenant ? tenant[optionsAttribute] : [];
+
       return (
         <td className="editable editing">
           <FormControl
             componentClass="select"
-            defaultValue={value.name}
-            onBlur={e => this.inlineEditController().onChange(e.target.value, additionalData)}
+            defaultValue={additionalData.property === 'osp_security_group' ? updatedInstancePropertiesRow.osp_security_group.id : updatedInstancePropertiesRow.osp_flavor.id}
+            onChange={e => this.handleSelectChange(e, additionalData)}
+            // onBlur={e => this.inlineEditController().onChange(e.target.value, additionalData)}
           >
             {options.map(opt => (
-              <option value={opt.name} key={opt.id}>
+              <option value={opt.id} name={opt.name} key={opt.id}>
                 {opt.name}
               </option>
             ))}
@@ -388,7 +421,7 @@ class PlanWizardInstancePropertiesStepTable extends React.Component {
               role: 'row',
               isEditing: () => this.inlineEditController().isEditing({ rowData }),
               onCancel: () => this.inlineEditController().onCancel({ rowData, rowIndex }),
-              onConfirm: () => this.inlineEditController().onConfirm({ rowData, rowIndex }),
+              onConfirm: () => this.inlineEditController().onConfirm({ rowData, rowIndex }), //{e => this.handleSelectChange(e, additionalData, rows)}
               last: rowIndex === sortedPaginatedRows.length - 1,
               tableRendersInModal: true
             })}
@@ -417,7 +450,10 @@ class PlanWizardInstancePropertiesStepTable extends React.Component {
 PlanWizardInstancePropertiesStepTable.propTypes = {
   rows: PropTypes.array,
   tenantsWithAttributesById: PropTypes.object,
-  destinationTenantIdsBySourceClusterId: PropTypes.object
+  destinationTenantIdsBySourceClusterId: PropTypes.object,
+  instancePropertiesRowsAction: PropTypes.func,
+  setInstancePropertiesSingleRowAction: PropTypes.func,
+  updatedInstancePropertiesRow: PropTypes.object
 };
 PlanWizardInstancePropertiesStepTable.defaultProps = {
   rows: [],

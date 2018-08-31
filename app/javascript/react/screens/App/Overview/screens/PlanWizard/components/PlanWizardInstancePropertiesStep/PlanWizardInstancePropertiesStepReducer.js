@@ -1,11 +1,16 @@
 import Immutable from 'seamless-immutable';
-import { QUERY_V2V_OSP_TENANT_ATTRIBUTES } from './PlanWizardInstancePropertiesStepConstants';
+import { QUERY_V2V_OSP_TENANT_ATTRIBUTES, SET_V2V_INSTANCE_PROPERTIES_SINGLE_ROW, QUERY_V2V_OSP_BEST_FIT_FLAVOR, SET_V2V_BEST_FIT_FLAVORS_IN_VM_ROWS, SET_V2V_INSTANCE_PROPERTIES_ROWS } from './PlanWizardInstancePropertiesStepConstants';
 
 const initialState = Immutable({
   tenantsWithAttributes: [],
   isFetchingTenantsWithAttributes: false,
   isRejectedTenantsWithAttributes: false,
-  errorTenantsWithAttributes: null
+  errorTenantsWithAttributes: null,
+  bestFitFlavors: [],
+  isFetchingBestFitFlavor: false,
+  isRejectedBestFitFlavor: false,
+  errorBestFitFlavor: null,
+  isSettingSecurityGroupsAndBestFitFlavors: true
 });
 
 export default (state = initialState, action) => {
@@ -23,6 +28,42 @@ export default (state = initialState, action) => {
         .set('errorTenantsWithAttributes', action.payload)
         .set('isFetchingTenantsWithAttributes', false)
         .set('isRejectedTenantsWithAttributes', true);
+    case `${QUERY_V2V_OSP_BEST_FIT_FLAVOR}_PENDING`:
+      return state.set('isFetchingBestFitFlavor', true).set('isRejectedBestFitFlavor', false);
+    case `${QUERY_V2V_OSP_BEST_FIT_FLAVOR}_FULFILLED`:
+      return state
+        .set('bestFitFlavors', action.payload.data.results)
+        .set('isFetchingBestFitFlavor', false)
+        .set('isRejectedBestFitFlavor', false)
+        .set('errorBestFitFlavor', null);
+    case `${QUERY_V2V_OSP_BEST_FIT_FLAVOR}_REJECTED`:
+      return state
+        .set('errorBestFitFlavor', action.payload)
+        .set('isFetchingBestFitFlavor', false)
+        .set('isRejectedBestFitFlavor', true);
+    case SET_V2V_BEST_FIT_FLAVORS_IN_VM_ROWS:
+      const vmBestFitFlavors = action.payload;
+      const instancePropertiesRowsUpdatedWithBestFlavor = [];
+      vmBestFitFlavors.forEach((vmFlavor) => {
+        const existingInstancePropertiesRow = state.instancePropertiesRows.find(row => row.id === vmFlavor.vmId);
+        const tenant = state.tenantsWithAttributes.find(tenant => tenant.id === vmFlavor.tenantId);
+        const tenantFlavors = tenant.flavors;
+        const tenantSecurityGroups = tenant.security_groups;
+        const bestFitFlavorName = tenantFlavors.find(flavor => flavor.id === vmFlavor.flavorId ).name;
+        const defaultSecurityGroupName = 'default';
+        const defaultSecurityGroupId = tenantSecurityGroups.find(securityGroup => securityGroup.name === defaultSecurityGroupName).id;
+        const rowUpdatedWithBestFlavor = {...existingInstancePropertiesRow, osp_flavor: {name: bestFitFlavorName, id: vmFlavor.flavorId}, osp_security_group: {name: defaultSecurityGroupName, id: defaultSecurityGroupId}, target_cluster_name: tenant.name};
+        instancePropertiesRowsUpdatedWithBestFlavor.push(rowUpdatedWithBestFlavor);
+      });
+      return state
+        .set('isSettingSecurityGroupsAndBestFitFlavors', false)
+        .set('instancePropertiesRows', instancePropertiesRowsUpdatedWithBestFlavor);
+    case SET_V2V_INSTANCE_PROPERTIES_SINGLE_ROW:
+      return state
+        .set('updatedInstancePropertiesRow', action.payload);
+    case SET_V2V_INSTANCE_PROPERTIES_ROWS:
+      return state
+        .set('instancePropertiesRows', action.payload);
     default:
       return state;
   }
